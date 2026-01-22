@@ -347,6 +347,7 @@ void CDigitShowBasicView::OnInitialUpdate()
     // For Modbus RTU, no CAIO-style event sampling setup is needed.
     // The timer-based polling at 100ms interval reads data directly.
     // Set Timer 1 interval to 100ms as per Modbus RTU requirements.
+    // NOTE: Timer interval could be made configurable if different polling rates are needed.
     ctx->timeSettings.Interval1 = 100;  // 100ms for Modbus RTU AI polling
     
     SetTimer(1,ctx->timeSettings.Interval1,NULL);    

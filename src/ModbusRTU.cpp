@@ -98,13 +98,11 @@ bool ModbusRTU::Open(const char* portName, uint8_t slaveAddress)
     m_slaveAddress = slaveAddress;
 
     // Open COM port
-    // Note: For COM ports > 9, use "\\.\COMxx" format
+    // For COM ports > 9 (e.g., COM10, COM11), Windows requires "\\.\COMxx" format
+    // COM1-COM9 can use either format, but we use the extended format for all ports
+    // to ensure compatibility
     char fullPortName[32];
-    if (strlen(portName) > 4 || _strnicmp(portName, "COM", 3) != 0) {
-        sprintf_s(fullPortName, "\\\\.\\%s", portName);
-    } else {
-        strcpy_s(fullPortName, portName);
-    }
+    sprintf_s(fullPortName, "\\\\.\\%s", portName);
 
     m_hSerial = CreateFileA(
         fullPortName,
@@ -268,6 +266,7 @@ bool ModbusRTU::SendReceive(const uint8_t* request, size_t requestLen,
     }
 
     // Verify CRC
+    // Modbus RTU transmits CRC in little-endian order (low byte first, high byte second)
     uint16_t receivedCRC = response[expectedResponseLen - 2] | 
                            (response[expectedResponseLen - 1] << 8);
     uint16_t calculatedCRC = CalculateCRC16(response, expectedResponseLen - 2);
@@ -356,14 +355,15 @@ bool ModbusRTU::WriteHoldingRegisters(const uint16_t* data)
 
     // Build request: Write Multiple Registers (0x10)
     // Request: [SlaveAddr][FuncCode][StartAddr_Hi][StartAddr_Lo][NumRegs_Hi][NumRegs_Lo][ByteCount][Data...][CRC_Lo][CRC_Hi]
-    uint8_t request[7 + AO_CHANNELS * 2 + 2]; // 7 header + 16 data + 2 CRC = 25 bytes
+    // Buffer size: 7 header bytes + (8 channels * 2 bytes) + 2 CRC bytes = 25 bytes
+    uint8_t request[7 + AO_CHANNELS * 2 + 2];
     request[0] = m_slaveAddress;
     request[1] = FC_WRITE_MULTIPLE_REGISTERS;
     request[2] = 0x00;  // Starting address high byte
     request[3] = 0x00;  // Starting address low byte (register 0)
     request[4] = 0x00;  // Number of registers high byte
     request[5] = AO_CHANNELS;  // Number of registers low byte (8)
-    request[6] = AO_CHANNELS * 2;  // Byte count (16)
+    request[6] = AO_CHANNELS * 2;  // Byte count (16 bytes for 8 registers)
 
     // Add data (big-endian)
     for (int i = 0; i < AO_CHANNELS; i++) {
