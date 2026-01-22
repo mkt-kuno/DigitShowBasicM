@@ -81,6 +81,9 @@
     <ClCompile Include="TransAdjustment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ModbusRTU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DigitShowBasic.rc">
@@ -103,14 +106,9 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="caio.lib" />
-  </ItemGroup>
+  <!-- Removed: caio.lib dependency (replaced with ModbusRTU) -->
   <ItemGroup>
     <ClInclude Include="boardsettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CAIO.H">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CalibrationAmp.h">
@@ -168,6 +166,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModbusRTU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

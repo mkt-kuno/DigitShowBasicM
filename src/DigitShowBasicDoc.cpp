@@ -20,11 +20,17 @@
 #include    "stdafx.h"
 #include    "DigitShowBasic.h"
 #include    "DigitShowBasicDoc.h"
-#include    "caio.h"
+#include    "ModbusRTU.h"
 #include    "dataconvert.h"
 
 #include    "time.h"
 #include    "math.h"
+
+// NOTE: The following areas may need manual adjustment after migration:
+// 1. The COM port for Modbus needs to be configured (currently hardcoded as "COM3")
+// 2. The Modbus slave address needs to be configured (currently set to 1)
+// 3. The timer-based AD acquisition is handled in DigitShowBasicView::OnTimer()
+// 4. DA output is now triggered only when values change, after AI read
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -102,104 +108,56 @@ void CDigitShowBasicDoc::Dump(CDumpContext& dc) const
 void CDigitShowBasicDoc::OpenBoard()
 {
     DigitShowContext* ctx = GetContext();
-    int    i;
     
     if(ctx->FlagSetBoard){
         AfxMessageBox("Initialization has been already accomplished", MB_ICONSTOP | MB_OK );
         return;
     }
     else{
-        // OPEN A/D BOARDS.
-        if(ctx->NumAD > 0 ){
-            ctx->Ret = AioInit ( "AIO000" , &ctx->ad.Id[0] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->ad.Id[0]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
+        // Open Modbus RTU connection
+        // NOTE: COM port should be configurable. Currently hardcoded to "COM3".
+        // TODO: Add configuration dialog for COM port selection.
+        ModbusRTU* modbus = GetModbusInstance();
+        
+        if(!modbus->Open("COM3", 1)){
+            ctx->TextString.Format("Modbus Open failed: %s", modbus->GetLastError());
+            AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK);
+            return;
         }
-        if(ctx->NumAD > 1){
-            ctx->Ret = AioInit ( "AIO001" , &ctx->ad.Id[1] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->ad.Id[1]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
-        }
-        // OPEN D/A BOARDS.
-        if(ctx->NumDA > 0){
-            ctx->Ret = AioInit("AIO003" , &ctx->da.Id[0] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->da.Id[0]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
-        }
-        // Set Sampling Condition
-        for(i = 0;i<ctx->NumAD;i++){
-            ctx->Ret = AioGetAiInputMethod ( ctx->ad.Id[i] , &ctx->ad.InputMethod[i] );
-            ctx->Ret = AioGetAiResolution ( ctx->ad.Id[i] , &ctx->ad.Resolution[i] );
-            ctx->Ret = AioGetAiMaxChannels ( ctx->ad.Id[i] , &ctx->ad.Channels[i] );
-            ctx->Ret = AioSetAiChannels ( ctx->ad.Id[i] , ctx->ad.Channels[i] );
-            ctx->AdMaxChannels = ctx->AdMaxChannels+ctx->ad.Channels[i]/2;
-            ctx->Ret = AioSetAiRangeAll ( ctx->ad.Id[i], 1 );
-            // (-5V, 5V)
-            ctx->Ret = AioGetAiRange ( ctx->ad.Id[i] , 0 , &ctx->ad.Range[i] );
-            ctx->Ret = GetRangeValue(ctx->ad.Range[i], &ctx->ad.RangeMax[i], &ctx->ad.RangeMin[i]);
-            ctx->Ret = AioGetAiMemoryType ( ctx->ad.Id[i] , &ctx->ad.MemoryType[i] );
-            ctx->Ret = AioGetAiSamplingClock ( ctx->ad.Id[i] , &ctx->ad.SamplingClock[i] );
-            //2020.02.13 M.Kuno ScanClock制御を追加
-            {
-                short maxChannels = 64;
-                ctx->Ret = AioGetAiMaxChannels(ctx->ad.Id[i], &maxChannels);
-                float scanClock = 1000.f / maxChannels;
-                ctx->Ret = AioSetAiScanClock(ctx->ad.Id[i], scanClock);
-                ctx->Ret = AioGetAiScanClock(ctx->ad.Id[i], &ctx->ad.ScanClock[i]);
-            }
-            ctx->Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[i] , &ctx->ad.SamplingTimes[i] );
-        }
+        
+        // Set fixed configuration for Modbus-based AD/DA
+        // AI: 16 channels (HX711: ch0-7, ADS1115: ch8-15), int16_t values
+        // AO: 8 channels (GP8403: ch0-7), 0-10000mV output
+        ctx->NumAD = 1;
+        ctx->NumDA = 1;
+        
+        // Configure AD settings for Modbus
+        ctx->ad.Id[0] = 0;  // Not used for Modbus
+        ctx->ad.Channels[0] = ModbusRTU::AI_CHANNELS;
+        ctx->ad.Resolution[0] = 16;  // int16_t
+        ctx->ad.InputMethod[0] = 0;  // Not applicable for Modbus
+        ctx->ad.Range[0] = 0;        // Raw int16_t values
+        ctx->ad.RangeMax[0] = 32767.0f;
+        ctx->ad.RangeMin[0] = -32768.0f;
+        ctx->ad.MemoryType[0] = 0;   // Not applicable for Modbus
+        ctx->ad.SamplingClock[0] = 100000.0f;  // 100ms = 100000us
+        ctx->ad.SamplingTimes[0] = 1;  // No buffering needed for Modbus
+        ctx->AdMaxChannels = ModbusRTU::AI_CHANNELS;
+        
+        // Configure DA settings for Modbus
+        ctx->da.Id[0] = 0;  // Not used for Modbus
+        ctx->da.Channels[0] = ModbusRTU::AO_CHANNELS;
+        ctx->da.Resolution[0] = 16;  // uint16_t
+        ctx->da.Range[0] = 50;       // 0-10V (equivalent)
+        ctx->da.RangeMax[0] = 10000.0f;  // 0-10000mV
+        ctx->da.RangeMin[0] = 0.0f;
+        
+        // Sampling settings (simplified for Modbus - no buffering/averaging needed)
         ctx->sampling.SavingTime = 300;
-        ctx->sampling.TotalSamplingTimes = long(ctx->sampling.SavingTime*1000000/ctx->ad.SamplingClock[0]);
-        ctx->sampling.AllocatedMemory = 4*ctx->AdMaxChannels* ctx->sampling.TotalSamplingTimes/1024.0f/1024.0f;
-        ctx->sampling.AvSmplNum = 20;
-        for(i = 0;i<ctx->NumDA;i++){
-            ctx->Ret = AioGetAoResolution ( ctx->da.Id[i] , &ctx->da.Resolution[i] );
-            ctx->Ret = AioGetAoMaxChannels ( ctx->da.Id[i] , &ctx->da.Channels[i] );
-            ctx->Ret = AioSetAoRangeAll ( ctx->da.Id[i] , 50 );
-            // 0 - 10V
-            ctx->Ret = AioGetAoRange ( ctx->da.Id[i] , 0 , &ctx->da.Range[i] );
-            ctx->Ret = GetRangeValue(ctx->da.Range[i], &ctx->da.RangeMax[i], &ctx->da.RangeMin[i]);
-        }
+        ctx->sampling.TotalSamplingTimes = ctx->sampling.SavingTime * 10;  // 10 samples/sec at 100ms interval
+        ctx->sampling.AllocatedMemory = 0.0f;  // No buffer allocation needed
+        ctx->sampling.AvSmplNum = 1;  // No averaging needed for Modbus (assuming no noise)
+        
         ctx->FlagSetBoard = TRUE;
     }
     return;
@@ -208,55 +166,73 @@ void CDigitShowBasicDoc::OpenBoard()
 void CDigitShowBasicDoc::CloseBoard()
 {
     DigitShowContext* ctx = GetContext();
-    // Close A/D and D/A board to end the application 
+    // Close Modbus connection
     if( ctx->FlagSetBoard==TRUE ){
-        if(ctx->NumAD > 0)    ctx->Ret = AioExit(ctx->ad.Id[0]);
-        if(ctx->NumAD > 1)    ctx->Ret = AioExit(ctx->ad.Id[1]);
-        if(ctx->NumDA > 0)    ctx->Ret = AioExit(ctx->da.Id[0]);
+        ModbusRTU* modbus = GetModbusInstance();
+        modbus->Close();
+        ctx->FlagSetBoard = FALSE;
     }
 }
 
 //--- Input from A/D Board ---
+// This function is called by the timer every 100ms (Timer ID 1 in DigitShowBasicView)
+// Reads 16 channels of int16_t data via Modbus RTU ReadInputRegisters
+// HX711 (ch 0-7): int16_t values
+// ADS1115 (ch 8-15): int16_t values
+// No averaging is performed (Modbus assumed to be noise-free)
 void CDigitShowBasicDoc::AD_INPUT()
 {
     DigitShowContext* ctx = GetContext();
-    int    i,j,k;
-    k = 0;
-    if(ctx->NumAD>0){
-        for(i = 0;i<ctx->ad.Channels[0]/2;i++){
-            ctx->Vout[k] = 0.0f;
-            for(j = 0;j<ctx->sampling.AvSmplNum;j++){
-                ctx->Vout[k] = ctx->Vout[k]+BinaryToVolt(ctx->ad.RangeMax[0], ctx->ad.RangeMin[0], ctx->ad.Resolution[0], ctx->ad.Data0[ctx->ad.Channels[0]*j+2*i])/float(ctx->sampling.AvSmplNum);
-            }
-            k = k+1;
-        }
+    ModbusRTU* modbus = GetModbusInstance();
+    
+    if(!modbus->IsOpen()){
+        return;
     }
-    if(ctx->NumAD>1){
-        for(i = 0;i<ctx->ad.Channels[1]/2;i++){
-            ctx->Vout[k] = 0.0f;
-            for(j = 0;j<ctx->sampling.AvSmplNum;j++){
-                ctx->Vout[k] = ctx->Vout[k]+BinaryToVolt(ctx->ad.RangeMax[1], ctx->ad.RangeMin[1], ctx->ad.Resolution[1], ctx->ad.Data1[ctx->ad.Channels[1]*j+2*i])/float(ctx->sampling.AvSmplNum);
-            }
-            k = k+1;
-        }
+    
+    // Read all 16 AI channels via Modbus
+    int16_t aiData[ModbusRTU::AI_CHANNELS];
+    if(!modbus->ReadInputRegisters(aiData)){
+        // Read failed - could log error here
+        // ctx->TextString.Format("Modbus read error: %s", modbus->GetLastError());
+        return;
+    }
+    
+    // Convert int16_t values to float for Vout
+    // NOTE: The calibration factors (ctx->cal) will convert these to physical values
+    // in Cal_Physical(). The raw int16_t values are stored as-is.
+    for(int i = 0; i < ModbusRTU::AI_CHANNELS; i++){
+        ctx->Vout[i] = static_cast<float>(aiData[i]);
     }
 }
 
 //--- Output to D/A Board ---
+// This function outputs to 8 channels via Modbus RTU WriteHoldingRegisters
+// GP8403 (ch 0-7): 0-10000 mV output, clamped to range
+// Only writes when values have changed (change detection is in ModbusRTU class)
 void CDigitShowBasicDoc::DA_OUTPUT()
 {
     DigitShowContext* ctx = GetContext();
-    int    i,j,k;
-    k = 0;
-    for(i = 0;i<ctx->NumDA;i++){
-        for(j = 0;j<ctx->da.Channels[i];j++){
-            if(ctx->DAVout[k]<0.0f)    ctx->DAVout[k] = 0.0f;
-            if(ctx->DAVout[k]>9.9999f) ctx->DAVout[k] = 9.9999f;
-            ctx->da.Data[j] = VoltToBinary(ctx->da.RangeMax[i], ctx->da.RangeMin[i], ctx->da.Resolution[i], ctx->DAVout[k]);
-            k = k+1;
-        }
-        ctx->Ret = AioMultiAo(ctx->da.Id[i], ctx->da.Channels[i], &ctx->da.Data[0]);
+    ModbusRTU* modbus = GetModbusInstance();
+    
+    if(!modbus->IsOpen()){
+        return;
     }
+    
+    // Convert DAVout (voltage) to mV for GP8403
+    // DAVout is in Volts (0-10V range), GP8403 expects 0-10000 mV
+    uint16_t aoData[ModbusRTU::AO_CHANNELS];
+    for(int i = 0; i < ModbusRTU::AO_CHANNELS; i++){
+        // Clamp voltage to 0-10V range
+        float voltage = ctx->DAVout[i];
+        if(voltage < 0.0f) voltage = 0.0f;
+        if(voltage > 10.0f) voltage = 10.0f;
+        
+        // Convert to mV (0-10000)
+        aoData[i] = static_cast<uint16_t>(voltage * 1000.0f);
+    }
+    
+    // Write to Modbus (only if values changed)
+    modbus->WriteHoldingRegisters(aoData);
 }
 
 //--- Calcuration of Physical Value ---

@@ -24,8 +24,12 @@
 #include "DigitShowBasicDoc.h"
 #include "DigitShowBasicView.h"
 
-#include "caio.h"
+#include "ModbusRTU.h"
 #include "SamplingSettings.h"
+
+// NOTE: CAIO dependency has been replaced with ModbusRTU
+// The FIFO/buffer-based sampling is no longer used.
+// Modbus RTU reads are done directly every 100ms via Timer.
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -339,39 +343,12 @@ void CDigitShowBasicView::OnInitialUpdate()
     m_Combo2->SetWindowText("1.0 s");
     CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
     pDoc->OpenBoard();
-    if(ctx->FlagSetBoard){
-        if(ctx->NumAD>0)    {
-            Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-            Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-
-            AiScanClocka = 60.0;
-            Ret = AioSetAiScanClock(ctx->ad.Id[0], AiScanClocka);
-
-            ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-            Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-            Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-            Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-            Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        }
-        if(ctx->NumAD>1)    {
-            Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-            Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-
-            AiScanClocka = 60.0;
-            Ret = AioSetAiScanClock(ctx->ad.Id[1], AiScanClocka);
-
-            ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-            Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-            Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-            Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-            Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        }
-        ctx->AdEvent = AIE_DATA_NUM | AIE_OFERR | AIE_SCERR | AIE_ADERR;
-        Ret = AioSetAiEvent(ctx->ad.Id[ctx->NumAD-1], m_hWnd, ctx->AdEvent);
-        Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-    }
+    
+    // For Modbus RTU, no CAIO-style event sampling setup is needed.
+    // The timer-based polling at 100ms interval reads data directly.
+    // Set Timer 1 interval to 100ms as per Modbus RTU requirements.
+    ctx->timeSettings.Interval1 = 100;  // 100ms for Modbus RTU AI polling
+    
     SetTimer(1,ctx->timeSettings.Interval1,NULL);    
 }
 
@@ -416,13 +393,22 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
     {
     case 1:
         { 
+            // Timer 1: 100ms interval for Modbus RTU
+            // 1. Read AI via ReadInputRegisters
+            // 2. Process calibration and calculate physical values
+            // 3. Write AO via WriteHoldingRegisters (only if changed)
             ctx->NowTime = ctx->NowTime.GetCurrentTime();
             ctx->SNowTime = ctx->NowTime.Format("%m/%d  %H:%M:%S");
             if(ctx->FlagSaveData){
                 ctx->SpanTime = ctx->NowTime- ctx->StartTime;
                 ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
             }    
-            if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+            if(ctx->FlagSetBoard) {
+                pDoc -> AD_INPUT();
+                // Modbus: AO output is triggered after AI read
+                // DA_OUTPUT will only write if values have changed
+                pDoc -> DA_OUTPUT();
+            }
             pDoc -> Cal_Physical();
             pDoc -> Cal_Param();
             ShowData();
@@ -430,6 +416,9 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
         break;
     case 2:
         { 
+            // Timer 2: Control feedback loop
+            // Control_DA sets the DAVout values based on control logic
+            // DA_OUTPUT is called inside Control_DA, but also triggered by Timer 1
             _ftime_s(&StepTime1);
             if(ctx->FlagCtrl==FALSE){
                 StepTime0 = StepTime1;
@@ -706,13 +695,13 @@ void CDigitShowBasicView::OnBUTTONStartSave()
         }
     }
     if(ctx->FlagSetBoard==TRUE && ctx->FlagFIFO==TRUE){
+        // NOTE: FIFO mode is not used with Modbus RTU
+        // Modbus uses simple timer-based polling, no buffering needed
         ctx->NowTime = ctx->NowTime.GetCurrentTime();
         ctx->StartTime = ctx->NowTime;
         ctx->SpanTime = ctx->NowTime- ctx->StartTime;
         ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-        if(ctx->NumAD>2) Ret = AioStopAi(ctx->ad.Id[2]);
+        // REMOVED: AioStopAi/AioStartAi calls - not needed for Modbus
         ctx->FlagSaveData = TRUE;
         ctx->sampling.CurrentSamplingTimes = 0;
         pDoc->Allocate_Memory();
@@ -728,17 +717,13 @@ void CDigitShowBasicView::OnBUTTONStartSave()
         myBTN4->EnableWindow(FALSE);
         myBTN5->EnableWindow(FALSE);
         myBTN6->EnableWindow(FALSE);
-        if(ctx->NumAD>0) Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+        // REMOVED: AioResetAiMemory/AioStartAi - not needed for Modbus
     }
 }
 
 void CDigitShowBasicView::OnBUTTONStopSave() 
 {
     DigitShowContext* ctx = GetContext();
-    long    Ret;
     CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
 
     if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==FALSE){
@@ -765,13 +750,9 @@ void CDigitShowBasicView::OnBUTTONStopSave()
         ctx->FlagSaveData = FALSE;
     }
     if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==TRUE){
+        // NOTE: FIFO mode is not used with Modbus RTU
         ctx->FlagSaveData = FALSE;
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+        // REMOVED: AioStopAi/AioResetAiMemory/AioStartAi - not needed for Modbus
         CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
         CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);    
         CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
@@ -802,43 +783,26 @@ void CDigitShowBasicView::OnBUTTONInterceptSave()
 
 void CDigitShowBasicView::OnBUTTONFIFOStart() 
 {
+    // NOTE: FIFO mode was used for high-speed CAIO buffered sampling
+    // For Modbus RTU, this feature is not applicable (simple polling is used)
+    // The function is kept for UI compatibility but CAIO calls are removed
     DigitShowContext* ctx = GetContext();
-    long    Ret;
-    int        nResult;
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
+    int nResult;
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
     CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);    
 
     if(ctx->FlagSetBoard==TRUE){
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
+        // REMOVED: AioStopAi - not needed for Modbus
         CSamplingSettings SamplingSettings;
         nResult = SamplingSettings.DoModal();
         if(nResult==IDOK){
-            if(ctx->NumAD>0)    {
-                Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , ctx->ad.SamplingClock[0] );
-                Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-                Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-                Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-                Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-                Ret = AioResetAiMemory(ctx->ad.Id[0]);
-            }
-            if(ctx->NumAD>1)    {
-                Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , ctx->ad.SamplingClock[1] );
-                Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-                Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-                Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-                Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-                Ret = AioResetAiMemory(ctx->ad.Id[1]);
-            }
-            Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
+            // REMOVED: CAIO sampling configuration - Modbus uses fixed 100ms polling
             ctx->sampling.SavingClock = ctx->ad.SamplingClock[0];
             ctx->FlagFIFO = TRUE;
             myBTN1->EnableWindow(FALSE);
             myBTN2->EnableWindow(TRUE);
         }
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+        // REMOVED: AioStartAi - not needed for Modbus
     }
     else{
         AfxMessageBox("Board Setting has not been accomplished yet.", MB_OK | MB_ICONSTOP, 0);    
@@ -847,45 +811,23 @@ void CDigitShowBasicView::OnBUTTONFIFOStart()
 
 void CDigitShowBasicView::OnBUTTONFIFOStop() 
 {
+    // NOTE: FIFO mode was used for high-speed CAIO buffered sampling
+    // For Modbus RTU, this feature is not applicable
     DigitShowContext* ctx = GetContext();
-    long    Ret;
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
     CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);    
-    if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
+    // REMOVED: AioStopAi - not needed for Modbus
     ctx->FlagFIFO = FALSE;
     myBTN1->EnableWindow(TRUE);
     myBTN2->EnableWindow(FALSE);
-    if(ctx->NumAD>0)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-        ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[0]);
-    }
-    if(ctx->NumAD>1)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-        ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[1]);
-    }
-    Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-    if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+    // REMOVED: All CAIO sampling configuration calls - not needed for Modbus
+    // Modbus uses fixed 100ms polling interval
 }
 
 void CDigitShowBasicView::OnBUTTONWriteData() 
 {
     DigitShowContext* ctx = GetContext();
-    long    Ret;
-    if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
+    // REMOVED: AioStopAi - not needed for Modbus
 
     CString    pFileName0, pFileName1,TmpString;
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_WriteData);
@@ -962,109 +904,23 @@ void CDigitShowBasicView::OnBUTTONWriteData()
         pDoc -> Allocate_Memory();
         myBTN1->EnableWindow(FALSE);
     }
-    if(ctx->NumAD>0)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-        ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[0]);
-    }
-    if(ctx->NumAD>1)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-        ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[1]);
-    }
-    Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-    if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+    // REMOVED: All CAIO sampling configuration - not needed for Modbus
+    // Modbus uses fixed 100ms polling interval
 }
 
 LRESULT CDigitShowBasicView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
-    DigitShowContext* ctx = GetContext();
-    int        i,j;
-    long    tmp,tmp0,tmp1;
-    long    Ret,Ret2;
+    // NOTE: CAIO event handling (AIOM_*) is not used with Modbus RTU
+    // The following CAIO event messages are no longer processed:
+    // - AIOM_AIE_DATA_NUM: Data ready event (Modbus uses direct polling)
+    // - AIOM_AIE_OFERR: Overflow error (not applicable for Modbus)
+    // - AIOM_AIE_SCERR: Sampling clock error (not applicable for Modbus)
+    // - AIOM_AIE_ADERR: AD conversion error (not applicable for Modbus)
+    // - AIOM_AIE_END: End event (not applicable for Modbus)
+    //
+    // If FIFO-based high-speed sampling is needed in the future,
+    // a different approach should be implemented for Modbus.
 
-    switch(message){
-    case AIOM_AIE_DATA_NUM:
-        if(ctx->NumAD>0)    {
-            Ret = AioGetAiSamplingCount ( ctx->ad.Id[0] , &tmp0 );
-            tmp = tmp0;
-        }
-        if(ctx->NumAD>1)    {
-            Ret = AioGetAiSamplingCount ( ctx->ad.Id[1] , &tmp1 );
-            if(tmp>tmp1) tmp = tmp1;
-        }
-        if(ctx->NumAD>0){
-            Ret = AioGetAiSamplingData(ctx->ad.Id[0], &tmp, &ctx->ad.Data0[0]);
-            if(Ret != 0){
-                Ret2 = AioGetErrorString(Ret, ctx->ErrorString);
-                ctx->TextString.Format("AioGetAiSamplingData = %d : %s", Ret, ctx->ErrorString);
-                AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK );
-            }
-        }
-        if(ctx->NumAD>1){
-            Ret = AioGetAiSamplingData(ctx->ad.Id[1], &tmp, &ctx->ad.Data1[0]);
-            if(Ret != 0){
-                Ret2 = AioGetErrorString(Ret, ctx->ErrorString);
-                ctx->TextString.Format("AioGetAiSamplingData = %d : %s", Ret, ctx->ErrorString);
-                AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK );
-            }
-        }
-        if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==TRUE){
-            for(i = 0;i<tmp;i++){
-                if(ctx->sampling.CurrentSamplingTimes>= ctx->sampling.TotalSamplingTimes) {
-                    OnBUTTONStopSave();
-                }
-                else{
-                    if(ctx->NumAD > 0){
-                        for(j = 0;j<ctx->ad.Channels[0]/2;j++){
-                            *((PLONG)ctx->pSmplData0 + ctx->sampling.CurrentSamplingTimes*ctx->ad.Channels[0]/2+j) = ctx->ad.Data0[i*ctx->ad.Channels[0]+2*j];
-                        }
-                    }
-                    if(ctx->NumAD > 1){
-                        for(j = 0;j<ctx->ad.Channels[1]/2;j++){
-                            *((PLONG)ctx->pSmplData1 + ctx->sampling.CurrentSamplingTimes*ctx->ad.Channels[1]/2+j) = ctx->ad.Data1[i*ctx->ad.Channels[1]+2*j];
-                        }
-                    }
-                    ctx->sampling.CurrentSamplingTimes = ctx->sampling.CurrentSamplingTimes+1;
-                }
-            }
-        }
-        return TRUE;
-    case AIOM_AIE_OFERR:
-        if(ctx->FlagFIFO){
-            AfxMessageBox("FIFO sttoped by the over flow int the memory of A/D board.", MB_OK | MB_ICONSTOP, 0);    
-        }
-        else{
-            if(ctx->NumAD>0){
-                Ret = AioResetAiMemory(ctx->ad.Id[0]);
-                Ret = AioStartAi(ctx->ad.Id[0]);
-            }
-            if(ctx->NumAD>1){
-                Ret = AioResetAiMemory(ctx->ad.Id[1]);
-                Ret = AioStartAi(ctx->ad.Id[1]);
-            }
-            AfxMessageBox("FIFO sttoped by the over flow, but restarted automatically.", MB_OK | MB_ICONSTOP, 0);    
-        }
-        return TRUE;
-    case AIOM_AIE_SCERR:
-        AfxMessageBox("FIFO sttoped by sampling error.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    case AIOM_AIE_ADERR:
-        AfxMessageBox("FIFO sttoped by the error in A/D convert.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    case AIOM_AIE_END:
-        AfxMessageBox("FIFO sttoped to reach the end.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    }    
     return CFormView::DefWindowProc(message, wParam, lParam);
 }
 
