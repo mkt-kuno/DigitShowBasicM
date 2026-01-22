@@ -115,8 +115,7 @@ void CDigitShowBasicDoc::OpenBoard()
     }
     else{
         // Open Modbus RTU connection
-        // NOTE: COM port should be configurable. Currently hardcoded to "COM3".
-        // TODO: Add configuration dialog for COM port selection.
+        // COM port is specified here - no configuration dialog needed
         ModbusRTU* modbus = GetModbusInstance();
         
         if(!modbus->Open("COM3", 1)){
@@ -158,6 +157,15 @@ void CDigitShowBasicDoc::OpenBoard()
         ctx->sampling.AllocatedMemory = 0.0f;  // No buffer allocation needed
         ctx->sampling.AvSmplNum = 1;  // No averaging needed for Modbus (assuming no noise)
         
+        // Output 0V to all AO channels on startup
+        uint16_t zeroOutput[ModbusRTU::AO_CHANNELS] = {0};
+        modbus->WriteHoldingRegisters(zeroOutput);
+        
+        // Initialize DAVout to 0
+        for(int i = 0; i < ModbusRTU::AO_CHANNELS; i++){
+            ctx->DAVout[i] = 0.0f;
+        }
+        
         ctx->FlagSetBoard = TRUE;
     }
     return;
@@ -169,6 +177,11 @@ void CDigitShowBasicDoc::CloseBoard()
     // Close Modbus connection
     if( ctx->FlagSetBoard==TRUE ){
         ModbusRTU* modbus = GetModbusInstance();
+        
+        // Output 0V to all AO channels before closing
+        uint16_t zeroOutput[ModbusRTU::AO_CHANNELS] = {0};
+        modbus->WriteHoldingRegisters(zeroOutput);
+        
         modbus->Close();
         ctx->FlagSetBoard = FALSE;
     }

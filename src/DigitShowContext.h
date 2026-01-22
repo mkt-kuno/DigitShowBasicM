@@ -247,7 +247,6 @@ struct DigitShowContext {
     // System flags
     bool FlagSetBoard;
     bool FlagSaveData;
-    bool FlagFIFO;
     bool FlagCtrl;
     bool FlagCyclic;
 

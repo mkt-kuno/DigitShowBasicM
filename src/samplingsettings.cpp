@@ -82,15 +82,13 @@ BOOL CSamplingSettings::OnInitDialog()
     m_Channels = ctx->AdMaxChannels;
     m_EventSamplingTimes = ctx->ad.SamplingTimes[0];
     m_AvSmplNum = ctx->sampling.AvSmplNum;
-    if(ctx->ad.MemoryType[0]==0) m_MemoryType = _T("FIFO");
-    if(ctx->ad.MemoryType[0]==1) m_MemoryType = _T("RING");
+    m_MemoryType = _T("Modbus RTU");  // Modbus uses polling, not buffered memory
     m_SamplingClock = ctx->ad.SamplingClock[0]/1000.0f;
     m_SavingTime = ctx->sampling.SavingTime;
     m_TotalSamplingTimes = ctx->sampling.TotalSamplingTimes;
     UpdateData(FALSE);
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_Check);
     CButton* myBTN2 = (CButton*)GetDlgItem(IDOK);
-    if(ctx->FlagFIFO==TRUE)    myBTN1->EnableWindow(FALSE);
     myBTN2->EnableWindow(FALSE);
     
     return TRUE;

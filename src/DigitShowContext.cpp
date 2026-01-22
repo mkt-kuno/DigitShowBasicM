@@ -64,7 +64,6 @@ void InitContext(DigitShowContext* ctx)
     // Initialize flags
     ctx->FlagSetBoard = false;
     ctx->FlagSaveData = false;
-    ctx->FlagFIFO = false;
     ctx->FlagCyclic = false;
     ctx->FlagCtrl = false;
 
