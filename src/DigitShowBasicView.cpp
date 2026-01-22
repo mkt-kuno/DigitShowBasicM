@@ -425,9 +425,11 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
         break;
     case 3:
         { 
+            // Timer 3: Data save timer (min 200ms interval)
+            // Uses cached data from Timer 1 (100ms) - no Modbus communication here
             _ftime_s(&NowTime2);
             ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
-            if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+            // Note: Cal_Physical and Cal_Param use cached Vout values from Timer 1
             pDoc -> Cal_Physical();
             pDoc -> Cal_Param();
             pDoc -> SaveToFile();
@@ -675,7 +677,7 @@ void CDigitShowBasicView::OnBUTTONStartSave()
         myBTN1->EnableWindow(FALSE);    
         myBTN2->EnableWindow(TRUE);
         myBTN3->EnableWindow(TRUE);
-        if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+        // Note: Use cached data from Timer 1 - no Modbus communication here
         pDoc -> Cal_Physical();
         pDoc -> Cal_Param();
         pDoc -> SaveToFile();
@@ -691,7 +693,7 @@ void CDigitShowBasicView::OnBUTTONStopSave()
         KillTimer(3);
         _ftime_s(&NowTime2);
         ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
-        if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+        // Note: Use cached data from Timer 1 - no Modbus communication here
         pDoc -> Cal_Physical();
         pDoc -> Cal_Param();
         pDoc -> SaveToFile();
@@ -715,7 +717,7 @@ void CDigitShowBasicView::OnBUTTONInterceptSave()
     
     _ftime_s(&NowTime2);
     ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );    
-    if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+    // Note: Use cached data from Timer 1 - no Modbus communication here
     pDoc -> Cal_Physical();
     pDoc -> Cal_Param();
     pDoc -> SaveToFile();    

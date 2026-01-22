@@ -126,7 +126,7 @@ void CDA_Pout::OnBUTTONDAOutput()
     ctx->DAVout[5] = m_DAVout05;
     ctx->DAVout[6] = m_DAVout06;
     ctx->DAVout[7] = m_DAVout07;
-    pDoc2->DA_OUTPUT();
+    // Note: DAVout values are written by Timer 1 DA_OUTPUT()
 }
 
 void CDA_Pout::OnBUTTONCalculation00()

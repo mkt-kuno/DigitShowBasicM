@@ -445,7 +445,7 @@ void CDigitShowBasicDoc::Control_DA()
                     ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
                     // RPM->0
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 2:
@@ -476,7 +476,7 @@ void CDigitShowBasicDoc::Control_DA()
                 ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
                 // RPM->0
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 3:
@@ -515,7 +515,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM->0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 4:
@@ -554,7 +554,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM->0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 5:
@@ -621,7 +621,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // Cruch:Up
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 6:
@@ -687,7 +687,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // Cruch:Up
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 7:
@@ -742,42 +742,42 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM -> 0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 8:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 9:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 10:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 11:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 12:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 13:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 14:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 15:
@@ -793,7 +793,7 @@ void CDigitShowBasicDoc::Control_DA()
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==5 )    Creep();
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==6 )    LinearEffectiveStressPath();
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==7 )    Creep2();
-                DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
             }
         }
         break;
@@ -809,7 +809,7 @@ void CDigitShowBasicDoc::Stop_Control()
     DigitShowContext* ctx = GetContext();
     ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
     //Motor Speed->0
-    DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
 }
 
 void CDigitShowBasicDoc::MLoading_Stress()
