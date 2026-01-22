@@ -1,4 +1,4 @@
-# DigitShowBasic (OpenSource Edition)
+# DigitShowBasicM (OpenSource Edition, for ModbusRTU)
 
 ![Github License](https://img.shields.io/github/license/mkt-kuno/DigitShowBasic)  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
@@ -7,7 +7,7 @@
 
 ## 簡単な説明
 東京大学の地盤研で使用されている、三軸試験機制御ソフトウェアのオープンソース版です。  
-ContecのAD/DAボードで動作させることを前提としています。  
+ModbusRTUのAD/DAボードで動作させることを前提としています。  
 このリポジトリのライセンスは **GPLv3** となっているため、注意してください。  
 
 ## 動作環境
@@ -15,8 +15,6 @@ ContecのAD/DAボードで動作させることを前提としています。
 x64のみ, ARM64不可、ARM64ECはなんとか可能、、、かもしれない
 - Visual Studio 2022
 Community版でOK, MFCライブラリ必須  
-- CONTEC API-AIO(WDM) Ver.8.90  
-適宜、CAIO.H, CAIO.LIBを置き換えて使用するDLLバージョン一致させれば最新版でも可。
 - CPU: x64 Intel/AMD問わず  
 [Passmark性能(マルチスレッド)](https://www.cpubenchmark.net/multithread/) 最低5000 推奨8000以上
 - RAM: 最低4GB 推奨8GB以上  
