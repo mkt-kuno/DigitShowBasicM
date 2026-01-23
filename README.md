@@ -2,17 +2,20 @@
 
 ![Github License](https://img.shields.io/github/license/mkt-kuno/DigitShowBasic)  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
-<img width="1019" height="739" alt="image" src="https://github.com/user-attachments/assets/2d86bec5-5eb6-4870-9612-685556bf65e4" />
+<img width="1019" height="739" alt="image" src="https://github.com/user-attachments/assets/c313a707-7f77-45ac-904d-c371248b2a10" />
 
 
 ## 簡単な説明
 東京大学の地盤研で使用されている、三軸試験機制御ソフトウェアのオープンソース版です。  
 ModbusRTUのAD/DAボードで動作させることを前提としています。  
+CONTECのAD/DAは [DigitShowBasic](https://github.com/mkt-kuno/DigitShowBasic)まで。  
 このリポジトリのライセンスは **GPLv3** となっているため、注意してください。  
 
 ## 動作環境
 - Windows 11  
 x64のみ, ARM64不可、ARM64ECはなんとか可能、、、かもしれない
+- AD/DA: ModbusRTU
+AI 16ch(int16_t), AO 8ch(uint16_t)のものを想定。float input registerには非対応。
 - Visual Studio 2022
 Community版でOK, MFCライブラリ必須  
 - CPU: x64 Intel/AMD問わず  
