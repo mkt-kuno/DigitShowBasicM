@@ -49,7 +49,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BoardSettings.cpp" />
     <ClCompile Include="CalibrationAmp.cpp" />
     <ClCompile Include="DigitShowContext.cpp" />
     <ClCompile Include="CalibrationFactor.cpp" />
@@ -69,7 +68,6 @@
     <ClCompile Include="DigitShowBasicView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ModbusRTU.cpp" />
-    <ClCompile Include="SamplingSettings.cpp" />
     <ClCompile Include="Specimen.cpp" />
     <ClCompile Include="TransAdjustment.cpp" />
   </ItemGroup>
@@ -88,7 +86,6 @@
   </ItemGroup>
   <!-- Removed: caio.lib dependency (replaced with ModbusRTU) -->
   <ItemGroup>
-    <ClInclude Include="boardsettings.h" />
     <ClInclude Include="CalibrationAmp.h" />
     <ClInclude Include="CalibrationFactor.h" />
     <ClInclude Include="Control_CLoading.h" />
@@ -99,7 +96,6 @@
     <ClInclude Include="Control_MLoading.h" />
     <ClInclude Include="Control_PreConsolidation.h" />
     <ClInclude Include="Control_Sensitivity.h" />
-    <ClInclude Include="DataConvert.h" />
     <ClInclude Include="DA_Channel.h" />
     <ClInclude Include="DA_Pout.h" />
     <ClInclude Include="DA_Vout.h" />
@@ -110,7 +106,6 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ModbusRTU.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="samplingsettings.h" />
     <ClInclude Include="Specimen.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TransAdjustment.h" />

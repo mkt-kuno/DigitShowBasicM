@@ -20,7 +20,6 @@
 #include "stdafx.h"
 #include "DigitShowBasic.h"
 #include "CalibrationFactor.h"
-
 #include "CalibrationAmp.h"
 
 #ifdef _DEBUG
@@ -348,88 +347,6 @@ void CCalibrationFactor::CF_Load()
         m_C14 = _T("CH14");
         m_C15 = _T("CH15");
     }
-    if(m_Channels=="CH16-CH31"){    
-        m_CFA00 = ctx->cal.a[16];
-        m_CFB00 = ctx->cal.b[16];
-        m_CFC00 = ctx->cal.c[16];
-        m_CFP00.Format("%11.5f",ctx->Phyout[16]);
-        m_CFA01 = ctx->cal.a[17];
-        m_CFB01 = ctx->cal.b[17];
-        m_CFC01 = ctx->cal.c[17];
-        m_CFP01.Format("%11.5f",ctx->Phyout[17]);
-        m_CFA02 = ctx->cal.a[18];
-        m_CFB02 = ctx->cal.b[18];
-        m_CFC02 = ctx->cal.c[18];
-        m_CFP02.Format("%11.5f",ctx->Phyout[18]);
-        m_CFA03 = ctx->cal.a[19];
-        m_CFB03 = ctx->cal.b[19];
-        m_CFC03 = ctx->cal.c[19];
-        m_CFP03.Format("%11.5f",ctx->Phyout[19]);
-        m_CFA04 = ctx->cal.a[20];
-        m_CFB04 = ctx->cal.b[20];
-        m_CFC04 = ctx->cal.c[20];
-        m_CFP04.Format("%11.5f",ctx->Phyout[20]);
-        m_CFA05 = ctx->cal.a[21];
-        m_CFB05 = ctx->cal.b[21];
-        m_CFC05 = ctx->cal.c[21];
-        m_CFP05.Format("%11.5f",ctx->Phyout[21]);
-        m_CFA06 = ctx->cal.a[22];
-        m_CFB06 = ctx->cal.b[22];
-        m_CFC06 = ctx->cal.c[22];
-        m_CFP06.Format("%11.5f",ctx->Phyout[22]);
-        m_CFA07 = ctx->cal.a[23];
-        m_CFB07 = ctx->cal.b[23];
-        m_CFC07 = ctx->cal.c[23];
-        m_CFP07.Format("%11.5f",ctx->Phyout[23]);
-        m_CFA08 = ctx->cal.a[24];
-        m_CFB08 = ctx->cal.b[24];
-        m_CFC08 = ctx->cal.c[24];
-        m_CFP08.Format("%11.5f",ctx->Phyout[24]);
-        m_CFA09 = ctx->cal.a[25];
-        m_CFB09 = ctx->cal.b[25];
-        m_CFC09 = ctx->cal.c[25];
-        m_CFP09.Format("%11.5f",ctx->Phyout[25]);
-        m_CFA10 = ctx->cal.a[26];
-        m_CFB10 = ctx->cal.b[26];
-        m_CFC10 = ctx->cal.c[26];
-        m_CFP10.Format("%11.5f",ctx->Phyout[26]);
-        m_CFA11 = ctx->cal.a[27];
-        m_CFB11 = ctx->cal.b[27];
-        m_CFC11 = ctx->cal.c[27];
-        m_CFP11.Format("%11.5f",ctx->Phyout[27]);
-        m_CFA12 = ctx->cal.a[28];
-        m_CFB12 = ctx->cal.b[28];
-        m_CFC12 = ctx->cal.c[28];
-        m_CFP12.Format("%11.5f",ctx->Phyout[28]);
-        m_CFA13 = ctx->cal.a[29];
-        m_CFB13 = ctx->cal.b[29];
-        m_CFC13 = ctx->cal.c[29];
-        m_CFP13.Format("%11.5f",ctx->Phyout[29]);
-        m_CFA14 = ctx->cal.a[30];
-        m_CFB14 = ctx->cal.b[30];
-        m_CFC14 = ctx->cal.c[30];
-        m_CFP14.Format("%11.5f",ctx->Phyout[30]);
-        m_CFA15 = ctx->cal.a[31];
-        m_CFB15 = ctx->cal.b[31];
-        m_CFC15 = ctx->cal.c[31];
-        m_CFP15.Format("%11.5f",ctx->Phyout[31]);
-        m_C00 = _T("CH16");
-        m_C01 = _T("CH17");
-        m_C02 = _T("CH18");
-        m_C03 = _T("CH19");
-        m_C04 = _T("CH20");
-        m_C05 = _T("CH21");
-        m_C06 = _T("CH22");
-        m_C07 = _T("CH23");
-        m_C08 = _T("CH24");
-        m_C09 = _T("CH25");
-        m_C10 = _T("CH26");
-        m_C11 = _T("CH27");
-        m_C12 = _T("CH28");
-        m_C13 = _T("CH29");
-        m_C14 = _T("CH30");
-        m_C15 = _T("CH31");
-    }
     UpdateData(FALSE);
 }
 
@@ -487,56 +404,6 @@ void CCalibrationFactor::OnBUTTONCFUpdate()
         ctx->cal.b[15] = m_CFB15;
         ctx->cal.c[15] = m_CFC15;
     }
-    if(m_Channels=="CH16-CH31"){    
-        ctx->cal.a[16] = m_CFA00;
-        ctx->cal.b[16] = m_CFB00;
-        ctx->cal.c[16] = m_CFC00;
-        ctx->cal.a[17] = m_CFA01;
-        ctx->cal.b[17] = m_CFB01;
-        ctx->cal.c[17] = m_CFC01;
-        ctx->cal.a[18] = m_CFA02;
-        ctx->cal.b[18] = m_CFB02;
-        ctx->cal.c[18] = m_CFC02;
-        ctx->cal.a[19] = m_CFA03;
-        ctx->cal.b[19] = m_CFB03;
-        ctx->cal.c[19] = m_CFC03;
-        ctx->cal.a[20] = m_CFA04;
-        ctx->cal.b[20] = m_CFB04;
-        ctx->cal.c[20] = m_CFC04;
-        ctx->cal.a[21] = m_CFA05;
-        ctx->cal.b[21] = m_CFB05;
-        ctx->cal.c[21] = m_CFC05;
-        ctx->cal.a[22] = m_CFA06;
-        ctx->cal.b[22] = m_CFB06;
-        ctx->cal.c[22] = m_CFC06;
-        ctx->cal.a[23] = m_CFA07;
-        ctx->cal.b[23] = m_CFB07;
-        ctx->cal.c[23] = m_CFC07;
-        ctx->cal.a[24] = m_CFA08;
-        ctx->cal.b[24] = m_CFB08;
-        ctx->cal.c[24] = m_CFC08;
-        ctx->cal.a[25] = m_CFA09;
-        ctx->cal.b[25] = m_CFB09;
-        ctx->cal.c[25] = m_CFC09;
-        ctx->cal.a[26] = m_CFA10;
-        ctx->cal.b[26] = m_CFB10;
-        ctx->cal.c[26] = m_CFC10;
-        ctx->cal.a[27] = m_CFA11;
-        ctx->cal.b[27] = m_CFB11;
-        ctx->cal.c[27] = m_CFC11;
-        ctx->cal.a[28] = m_CFA12;
-        ctx->cal.b[28] = m_CFB12;
-        ctx->cal.c[28] = m_CFC12;
-        ctx->cal.a[29] = m_CFA13;
-        ctx->cal.b[29] = m_CFB13;
-        ctx->cal.c[29] = m_CFC13;
-        ctx->cal.a[30] = m_CFA14;
-        ctx->cal.b[30] = m_CFB14;
-        ctx->cal.c[30] = m_CFC14;
-        ctx->cal.a[31] = m_CFA15;
-        ctx->cal.b[31] = m_CFB15;
-        ctx->cal.c[31] = m_CFC15;
-    }
 }
 
 
@@ -545,7 +412,6 @@ void CCalibrationFactor::OnBUTTONZero00()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[0] = ctx->cal.c[0]-ctx->Phyout[0];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[16] = ctx->cal.c[16]-ctx->Phyout[16];
     CF_Load();
 }
 
@@ -554,7 +420,6 @@ void CCalibrationFactor::OnBUTTONZero01()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[1] = ctx->cal.c[1]-ctx->Phyout[1];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[17] = ctx->cal.c[17]-ctx->Phyout[17];
     CF_Load();
 }
 
@@ -563,7 +428,6 @@ void CCalibrationFactor::OnBUTTONZero02()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[2] = ctx->cal.c[2]-ctx->Phyout[2];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[18] = ctx->cal.c[18]-ctx->Phyout[18];
     CF_Load();
 }
 
@@ -572,7 +436,6 @@ void CCalibrationFactor::OnBUTTONZero03()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[3] = ctx->cal.c[3]-ctx->Phyout[3];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[19] = ctx->cal.c[19]-ctx->Phyout[19];
     CF_Load();    
 }
 
@@ -581,7 +444,6 @@ void CCalibrationFactor::OnBUTTONZero04()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[4] = ctx->cal.c[4]-ctx->Phyout[4];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[20] = ctx->cal.c[20]-ctx->Phyout[20];
     CF_Load();    
 }
 
@@ -590,7 +452,6 @@ void CCalibrationFactor::OnBUTTONZero05()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[5] = ctx->cal.c[5]-ctx->Phyout[5];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[21] = ctx->cal.c[21]-ctx->Phyout[21];
     CF_Load();
 }
 
@@ -599,7 +460,6 @@ void CCalibrationFactor::OnBUTTONZero06()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[6] = ctx->cal.c[6]-ctx->Phyout[6];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[22] = ctx->cal.c[22]-ctx->Phyout[22];
     CF_Load();
 }
 
@@ -608,7 +468,6 @@ void CCalibrationFactor::OnBUTTONZero07()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[7] = ctx->cal.c[7]-ctx->Phyout[7];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[23] = ctx->cal.c[23]-ctx->Phyout[23];
     CF_Load();
 }
 
@@ -617,7 +476,6 @@ void CCalibrationFactor::OnBUTTONZero08()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[8] = ctx->cal.c[8]-ctx->Phyout[8];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[24] = ctx->cal.c[24]-ctx->Phyout[24];
     CF_Load();
 }
 
@@ -626,7 +484,6 @@ void CCalibrationFactor::OnBUTTONZero09()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[9] = ctx->cal.c[9]-ctx->Phyout[9];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[25] = ctx->cal.c[25]-ctx->Phyout[25];
     CF_Load();
 }
 
@@ -635,7 +492,6 @@ void CCalibrationFactor::OnBUTTONZero10()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[10] = ctx->cal.c[10]-ctx->Phyout[10];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[26] = ctx->cal.c[26]-ctx->Phyout[26];
     CF_Load();
 }
 
@@ -644,7 +500,6 @@ void CCalibrationFactor::OnBUTTONZero11()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[11] = ctx->cal.c[11]-ctx->Phyout[11];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[27] = ctx->cal.c[27]-ctx->Phyout[27];
     CF_Load();    
 }
 
@@ -653,7 +508,6 @@ void CCalibrationFactor::OnBUTTONZero12()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[12] = ctx->cal.c[12]-ctx->Phyout[12];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[28] = ctx->cal.c[28]-ctx->Phyout[28];
     CF_Load();    
 }
 
@@ -662,7 +516,6 @@ void CCalibrationFactor::OnBUTTONZero13()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[13] = ctx->cal.c[13]-ctx->Phyout[13];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[29] = ctx->cal.c[29]-ctx->Phyout[29];
     CF_Load();    
 }
 
@@ -671,7 +524,6 @@ void CCalibrationFactor::OnBUTTONZero14()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[14] = ctx->cal.c[14]-ctx->Phyout[14];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[30] = ctx->cal.c[30]-ctx->Phyout[30];
     CF_Load();    
 }
 
@@ -680,7 +532,6 @@ void CCalibrationFactor::OnBUTTONZero15()
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
     if(m_Channels=="CH0-CH15")    ctx->cal.c[15] = ctx->cal.c[15]-ctx->Phyout[15];
-    if(m_Channels=="CH16-CH31")    ctx->cal.c[31] = ctx->cal.c[31]-ctx->Phyout[31];
     CF_Load();
 }
 
@@ -691,8 +542,7 @@ void CCalibrationFactor::OnBUTTONAmp00()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 0;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 16;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS ){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -706,8 +556,7 @@ void CCalibrationFactor::OnBUTTONAmp01()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 1;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 17;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -721,8 +570,7 @@ void CCalibrationFactor::OnBUTTONAmp02()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 2;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 18;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -736,8 +584,7 @@ void CCalibrationFactor::OnBUTTONAmp03()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 3;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 19;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -751,8 +598,7 @@ void CCalibrationFactor::OnBUTTONAmp04()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 4;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 20;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -766,8 +612,7 @@ void CCalibrationFactor::OnBUTTONAmp05()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 5;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 21;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -781,8 +626,7 @@ void CCalibrationFactor::OnBUTTONAmp06()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 6;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 22;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -796,8 +640,7 @@ void CCalibrationFactor::OnBUTTONAmp07()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 7;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 23;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -811,8 +654,7 @@ void CCalibrationFactor::OnBUTTONAmp08()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 8;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 24;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -826,8 +668,7 @@ void CCalibrationFactor::OnBUTTONAmp09()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 9;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 25;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -841,8 +682,7 @@ void CCalibrationFactor::OnBUTTONAmp10()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 10;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 26;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS ){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -856,8 +696,7 @@ void CCalibrationFactor::OnBUTTONAmp11()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 11;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 27;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -871,8 +710,7 @@ void CCalibrationFactor::OnBUTTONAmp12()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 12;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 28;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -886,8 +724,7 @@ void CCalibrationFactor::OnBUTTONAmp13()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 13;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 29;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -901,8 +738,7 @@ void CCalibrationFactor::OnBUTTONAmp14()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 14;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 30;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -916,8 +752,7 @@ void CCalibrationFactor::OnBUTTONAmp15()
     DigitShowContext* ctx = GetContext();
     int    nResult;
     if(m_Channels=="CH0-CH15")    ctx->AmpID = 15;
-    if(m_Channels=="CH16-CH31")    ctx->AmpID = 31;
-    if( ctx->AmpID<=ctx->AdMaxChannels ){
+    if( ctx->AmpID<=ModbusRTU::AI_CHANNELS ){
         CCalibrationAmp CalibrationAmp;
         nResult = CalibrationAmp.DoModal();
         if(nResult==IDOK){
@@ -942,8 +777,8 @@ void CCalibrationFactor::OnBUTTONCFSave()
         pFileName = CalSaveFile_dlg.GetPathName();    
         if((err = fopen_s(&FileCalData,(LPCSTR)pFileName , _T("w"))) == 0)
         {
-            fprintf(FileCalData,"64 \n");
-            for(i = 0;i<64;i++){
+            fprintf(FileCalData,"%d \n", ModbusRTU::AI_CHANNELS);
+            for(i = 0;i< ModbusRTU::AI_CHANNELS;i++){
                 fprintf(FileCalData,"%d    %lf    %lf    %lf\n",i,ctx->cal.a[i],ctx->cal.b[i],ctx->cal.c[i]);
             }
             fclose(FileCalData);
@@ -968,7 +803,8 @@ void CCalibrationFactor::OnBUTTONCFLoadFile()
         if((err = fopen_s(&FileCalData,(LPCSTR)pFileName , _T("r"))) == 0)
         {
             fscanf_s(FileCalData,_T("%d"),&j);
-            for(i = 0;i<64;i++){
+            if (j > ModbusRTU::AI_CHANNELS) j = ModbusRTU::AI_CHANNELS;
+            for(i = 0;i< j;i++){
                 fscanf_s(FileCalData,_T("%d%lf%lf%lf"),&j,&ctx->cal.a[i],&ctx->cal.b[i],&ctx->cal.c[i]);
             }
             fclose(FileCalData);
@@ -980,11 +816,6 @@ void CCalibrationFactor::OnBUTTONCFLoadFile()
 void CCalibrationFactor::OnBUTTONChannelChange() 
 {
     DigitShowContext* ctx = GetContext();
-    if(m_Channels=="CH0-CH15"){
-        m_Channels ="CH16-CH31";
-    }
-    else if(m_Channels=="CH16-CH31"){
-        m_Channels ="CH0-CH15";
-    }
+    m_Channels = "CH0-CH15";
     CF_Load();
 }

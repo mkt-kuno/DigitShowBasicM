@@ -21,7 +21,6 @@
 #include    "DigitShowBasic.h"
 #include    "DigitShowBasicDoc.h"
 #include    "ModbusRTU.h"
-#include    "dataconvert.h"
 
 #include    "time.h"
 #include    "math.h"
@@ -124,38 +123,9 @@ void CDigitShowBasicDoc::OpenBoard()
             return;
         }
         
-        // Set fixed configuration for Modbus-based AD/DA
-        // AI: 16 channels (HX711: ch0-7, ADS1115: ch8-15), int16_t values
-        // AO: 8 channels (GP8403: ch0-7), 0-10000mV output
-        ctx->NumAD = 1;
-        ctx->NumDA = 1;
-        
-        // Configure AD settings for Modbus
-        ctx->ad.Id[0] = 0;  // Not used for Modbus
-        ctx->ad.Channels[0] = ModbusRTU::AI_CHANNELS;
-        ctx->ad.Resolution[0] = 16;  // int16_t
-        ctx->ad.InputMethod[0] = 0;  // Not applicable for Modbus
-        ctx->ad.Range[0] = 0;        // Raw int16_t values
-        ctx->ad.RangeMax[0] = 32767.0f;
-        ctx->ad.RangeMin[0] = -32768.0f;
-        ctx->ad.MemoryType[0] = 0;   // Not applicable for Modbus
-        ctx->ad.SamplingClock[0] = 100000.0f;  // 100ms = 100000us
-        ctx->ad.SamplingTimes[0] = 1;  // No buffering needed for Modbus
-        ctx->AdMaxChannels = ModbusRTU::AI_CHANNELS;
-        
-        // Configure DA settings for Modbus
-        ctx->da.Id[0] = 0;  // Not used for Modbus
-        ctx->da.Channels[0] = ModbusRTU::AO_CHANNELS;
-        ctx->da.Resolution[0] = 16;  // uint16_t
-        ctx->da.Range[0] = 50;       // 0-10V (equivalent)
-        ctx->da.RangeMax[0] = 10000.0f;  // 0-10000mV
-        ctx->da.RangeMin[0] = 0.0f;
-        
         // Sampling settings (simplified for Modbus - no buffering/averaging needed)
         ctx->sampling.SavingTime = 300;
         ctx->sampling.TotalSamplingTimes = ctx->sampling.SavingTime * 10;  // 10 samples/sec at 100ms interval
-        ctx->sampling.AllocatedMemory = 0.0f;  // No buffer allocation needed
-        ctx->sampling.AvSmplNum = 1;  // No averaging needed for Modbus (assuming no noise)
         
         // Output 0V to all AO channels on startup
         uint16_t zeroOutput[ModbusRTU::AO_CHANNELS] = {0};
@@ -253,7 +223,7 @@ void CDigitShowBasicDoc::Cal_Physical()
 {
     DigitShowContext* ctx = GetContext();
     int    i;
-    for(i = 0;i<64;i++){
+    for(i = 0;i< ModbusRTU::AI_CHANNELS;i++){
         ctx->Phyout[i] =    ctx->cal.a[i]* ctx->Vout[i]* ctx->Vout[i] + ctx->cal.b[i]* ctx->Vout[i] + ctx->cal.c[i];
     }
 }
@@ -335,12 +305,10 @@ void CDigitShowBasicDoc::SaveToFile()
     k = 0;
     fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->SequentTime2);
     fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->SequentTime2);
-    for(i = 0;i<ctx->NumAD;i++){
-        for(j = 0;j<ctx->ad.Channels[i]/2;j++){
-            fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vout[k]);
-            fprintf(ctx->FileSaveData1,"%lf    ", ctx->Phyout[k]);
-            k = k+1;
-        }
+    for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
+        fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vout[k]);
+        fprintf(ctx->FileSaveData1,"%lf    ", ctx->Phyout[k]);
+        k = k+1;
     }
     fprintf(ctx->FileSaveData0,"\n");
     fprintf(ctx->FileSaveData1,"\n");
@@ -360,45 +328,15 @@ void CDigitShowBasicDoc::SaveToFile2()
         k = 0;
         fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
         fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
-        if(ctx->NumAD>0){
-            for(j = 0;j<ctx->ad.Channels[0]/2;j++){
-                ctx->Vtmp = BinaryToVolt(ctx->ad.RangeMax[0], ctx->ad.RangeMin[0], ctx->ad.Resolution[0], *((PLONG)ctx->pSmplData0+i*ctx->ad.Channels[0]/2+j));
-                ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
-                k = k+1;
-                fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
-                fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
-            }
-        }
-        if(ctx->NumAD>1){
-            for(j = 0;j<ctx->ad.Channels[1]/2;j++){
-                ctx->Vtmp = BinaryToVolt(ctx->ad.RangeMax[1], ctx->ad.RangeMin[1], ctx->ad.Resolution[1], *((PLONG)ctx->pSmplData1+i*ctx->ad.Channels[1]/2+j));
-                ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
-                k = k+1;
-                fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
-                fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
-            }
+        for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
+            ctx->Vtmp = ctx->ai_raw[j];
+            ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
+            k = k+1;
+            fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
+            fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
         }
         fprintf(ctx->FileSaveData0,"\n");
         fprintf(ctx->FileSaveData1,"\n");
-    }
-}
-
-void CDigitShowBasicDoc::Allocate_Memory()
-{
-    DigitShowContext* ctx = GetContext();
-    if(ctx->FlagSaveData==TRUE){
-        if(ctx->NumAD>0){
-            ctx->hHeap0 = GetProcessHeap();
-            ctx->pSmplData0 = HeapAlloc(ctx->hHeap0,HEAP_ZERO_MEMORY,unsigned long(ctx->sampling.TotalSamplingTimes*ctx->ad.Channels[0]/2*sizeof(LONG)));
-        }
-        if(ctx->NumAD>1){
-            ctx->hHeap1 = GetProcessHeap();
-            ctx->pSmplData1 = HeapAlloc(ctx->hHeap1,HEAP_ZERO_MEMORY,unsigned long(ctx->sampling.TotalSamplingTimes*ctx->ad.Channels[1]/2*sizeof(LONG)));
-        }
-    }
-    if(ctx->FlagSaveData==FALSE){
-        if(ctx->NumAD>0)    HeapFree(ctx->hHeap0,0,ctx->pSmplData0);
-        if(ctx->NumAD>1)    HeapFree(ctx->hHeap1,0,ctx->pSmplData1);
     }
 }
 

@@ -1,12 +1,11 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by DigitShowBasic.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// DigitShowBasic.rc で使用
 //
 #define IDD_ABOUTBOX                    100
 #define IDD_DIGITSHOWBASIC_FORM         101
 #define IDR_MAINFRAME                   128
 #define IDR_DIGITSTYPE                  129
-#define IDD_BoardSettings               132
 #define IDD_Calibration_Factor          133
 #define IDD_CalibrationAmp              134
 #define IDD_SpecimenData                135
@@ -19,7 +18,6 @@
 #define IDD_Control_Sensitivity         143
 #define IDD_Control_Cloading            144
 #define IDD_Control_File                145
-#define IDD_SamplingSettings            146
 #define IDD_Control_PreConsolidation    147
 #define IDD_TransAdjustment             148
 #define IDD_Control_LinearStressPathLoading 149
@@ -399,38 +397,16 @@
 #define IDC_EDIT_StepNum                1767
 #define IDC_BUTTON_ReadFile             1771
 #define IDC_EDIT_SCFNum                 1773
-#define IDC_EDIT_ADMethod0              1776
-#define IDC_EDIT_ADMethod1              1777
-#define IDC_BUTTON_Check                1779
-#define IDC_EDIT_ADResolution0          1780
 #define IDC_BUTTON_FIFOStart            1780
-#define IDC_EDIT_ADResolution1          1781
 #define IDC_BUTTON_FIFOStop             1781
-#define IDC_EDIT_MemoryType             1781
 #define IDC_EDIT_Channels               1782
-#define IDC_EDIT_ADRange0               1783
-#define IDC_EDIT_AllocatedMemory        1783
-#define IDC_EDIT_ADRange1               1784
-#define IDC_EDIT_SamplingClock          1784
-#define IDC_EDIT_SavingTime             1785
-#define IDC_EDIT_ADMaxChannel0          1786
-#define IDC_EDIT_EventSamplingTimes     1786
-#define IDC_EDIT_ADMaxChannel1          1787
-#define IDC_EDIT_TotalSamplingTimes     1788
 #define IDC_BUTTON_WriteData            1791
 #define IDC_COMBO_Control_ID            1792
 #define IDC_COMBO_SamplingTime          1793
-#define IDC_EDIT_TimeInterval1          1794
-#define IDC_EDIT_TimeInterval2          1795
-#define IDC_EDIT_TimeInterval3          1796
-#define IDC_EDIT_AvSmplNum              1797
-#define IDC_EDIT_DAResolution0          1798
 #define IDC_BUTTON_InitialBullet        1800
-#define IDC_EDIT_DARange0               1801
 #define IDC_BUTTON_EndBullet            1801
 #define IDC_EDIT_InitialBullet          1802
 #define IDC_EDIT_FinalBullet            1803
-#define IDC_EDIT_DAMaxChannel0          1804
 #define IDC_BUTTON_InitialDisp          1804
 #define IDC_BUTTON_EndDisp              1805
 #define IDC_EDIT_FinalDisp              1806

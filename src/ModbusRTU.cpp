@@ -115,8 +115,7 @@ bool ModbusRTU::Open(const char* portName, uint8_t slaveAddress)
     );
 
     if (m_hSerial == INVALID_HANDLE_VALUE) {
-        DWORD err = GetLastError();
-        sprintf_s(m_lastError, "Failed to open %s (error %lu)", portName, err);
+        sprintf_s(m_lastError, "Failed to open %s", portName);
         return false;
     }
 
@@ -142,7 +141,7 @@ bool ModbusRTU::ConfigureSerialPort()
     dcb.DCBlength = sizeof(dcb);
 
     if (!GetCommState(m_hSerial, &dcb)) {
-        sprintf_s(m_lastError, "Failed to get COM state (error %lu)", GetLastError());
+        sprintf_s(m_lastError, "Failed to get COM state (error %s)", GetLastError());
         return false;
     }
 
@@ -165,7 +164,7 @@ bool ModbusRTU::ConfigureSerialPort()
     dcb.fAbortOnError = FALSE;
 
     if (!SetCommState(m_hSerial, &dcb)) {
-        sprintf_s(m_lastError, "Failed to set COM state (error %lu)", GetLastError());
+        sprintf_s(m_lastError, "Failed to set COM state (error %s)", GetLastError());
         return false;
     }
 
@@ -178,7 +177,7 @@ bool ModbusRTU::ConfigureSerialPort()
     timeouts.WriteTotalTimeoutMultiplier = 10;
 
     if (!SetCommTimeouts(m_hSerial, &timeouts)) {
-        sprintf_s(m_lastError, "Failed to set COM timeouts (error %lu)", GetLastError());
+        sprintf_s(m_lastError, "Failed to set COM timeouts (error %s)", GetLastError());
         return false;
     }
 
@@ -221,7 +220,7 @@ bool ModbusRTU::SendReceive(const uint8_t* request, size_t requestLen,
     // Send request
     DWORD bytesWritten = 0;
     if (!WriteFile(m_hSerial, request, (DWORD)requestLen, &bytesWritten, NULL)) {
-        sprintf_s(m_lastError, "Write failed (error %lu)", GetLastError());
+        sprintf_s(m_lastError, "Write failed (error %s)", GetLastError());
         return false;
     }
 
@@ -240,7 +239,7 @@ bool ModbusRTU::SendReceive(const uint8_t* request, size_t requestLen,
     while (totalRead < expectedResponseLen) {
         if (!ReadFile(m_hSerial, response + totalRead, 
                       (DWORD)(expectedResponseLen - totalRead), &bytesRead, NULL)) {
-            sprintf_s(m_lastError, "Read failed (error %lu)", GetLastError());
+            sprintf_s(m_lastError, "Read failed (error %s)", GetLastError());
             return false;
         }
         

@@ -25,7 +25,6 @@
 #include "DigitShowBasicView.h"
 
 #include "ModbusRTU.h"
-#include "SamplingSettings.h"
 
 // NOTE: CAIO dependency has been replaced with ModbusRTU
 // The FIFO/buffer-based sampling is no longer used.
@@ -78,22 +77,6 @@ CDigitShowBasicView::CDigitShowBasicView()
     m_Vout13 = _T("");
     m_Vout14 = _T("");
     m_Vout15 = _T("");
-    m_Vout16 = _T("");
-    m_Vout17 = _T("");
-    m_Vout18 = _T("");
-    m_Vout19 = _T("");
-    m_Vout20 = _T("");
-    m_Vout21 = _T("");
-    m_Vout22 = _T("");
-    m_Vout23 = _T("");
-    m_Vout24 = _T("");
-    m_Vout25 = _T("");
-    m_Vout26 = _T("");
-    m_Vout27 = _T("");
-    m_Vout28 = _T("");
-    m_Vout29 = _T("");
-    m_Vout30 = _T("");
-    m_Vout31 = _T("");
     m_Phyout00 = _T("");
     m_Phyout01 = _T("");
     m_Phyout02 = _T("");
@@ -110,22 +93,6 @@ CDigitShowBasicView::CDigitShowBasicView()
     m_Phyout13 = _T("");
     m_Phyout14 = _T("");
     m_Phyout15 = _T("");
-    m_Phyout16 = _T("");
-    m_Phyout17 = _T("");
-    m_Phyout18 = _T("");
-    m_Phyout19 = _T("");
-    m_Phyout20 = _T("");
-    m_Phyout21 = _T("");
-    m_Phyout22 = _T("");
-    m_Phyout23 = _T("");
-    m_Phyout24 = _T("");
-    m_Phyout25 = _T("");
-    m_Phyout26 = _T("");
-    m_Phyout27 = _T("");
-    m_Phyout28 = _T("");
-    m_Phyout29 = _T("");
-    m_Phyout30 = _T("");
-    m_Phyout31 = _T("");
     m_Para00 = _T("");
     m_Para01 = _T("");
     m_Para02 = _T("");
@@ -181,22 +148,6 @@ void CDigitShowBasicView::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_Vout13, m_Vout13);
     DDX_Text(pDX, IDC_EDIT_Vout14, m_Vout14);
     DDX_Text(pDX, IDC_EDIT_Vout15, m_Vout15);
-    DDX_Text(pDX, IDC_EDIT_Vout16, m_Vout16);
-    DDX_Text(pDX, IDC_EDIT_Vout17, m_Vout17);
-    DDX_Text(pDX, IDC_EDIT_Vout18, m_Vout18);
-    DDX_Text(pDX, IDC_EDIT_Vout19, m_Vout19);
-    DDX_Text(pDX, IDC_EDIT_Vout20, m_Vout20);
-    DDX_Text(pDX, IDC_EDIT_Vout21, m_Vout21);
-    DDX_Text(pDX, IDC_EDIT_Vout22, m_Vout22);
-    DDX_Text(pDX, IDC_EDIT_Vout23, m_Vout23);
-    DDX_Text(pDX, IDC_EDIT_Vout24, m_Vout24);
-    DDX_Text(pDX, IDC_EDIT_Vout25, m_Vout25);
-    DDX_Text(pDX, IDC_EDIT_Vout26, m_Vout26);
-    DDX_Text(pDX, IDC_EDIT_Vout27, m_Vout27);
-    DDX_Text(pDX, IDC_EDIT_Vout28, m_Vout28);
-    DDX_Text(pDX, IDC_EDIT_Vout29, m_Vout29);
-    DDX_Text(pDX, IDC_EDIT_Vout30, m_Vout30);
-    DDX_Text(pDX, IDC_EDIT_Vout31, m_Vout31);
     DDX_Text(pDX, IDC_EDIT_Phyout00, m_Phyout00);
     DDX_Text(pDX, IDC_EDIT_Phyout01, m_Phyout01);
     DDX_Text(pDX, IDC_EDIT_Phyout02, m_Phyout02);
@@ -213,22 +164,6 @@ void CDigitShowBasicView::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_Phyout13, m_Phyout13);
     DDX_Text(pDX, IDC_EDIT_Phyout14, m_Phyout14);
     DDX_Text(pDX, IDC_EDIT_Phyout15, m_Phyout15);
-    DDX_Text(pDX, IDC_EDIT_Phyout16, m_Phyout16);
-    DDX_Text(pDX, IDC_EDIT_Phyout17, m_Phyout17);
-    DDX_Text(pDX, IDC_EDIT_Phyout18, m_Phyout18);
-    DDX_Text(pDX, IDC_EDIT_Phyout19, m_Phyout19);
-    DDX_Text(pDX, IDC_EDIT_Phyout20, m_Phyout20);
-    DDX_Text(pDX, IDC_EDIT_Phyout21, m_Phyout21);
-    DDX_Text(pDX, IDC_EDIT_Phyout22, m_Phyout22);
-    DDX_Text(pDX, IDC_EDIT_Phyout23, m_Phyout23);
-    DDX_Text(pDX, IDC_EDIT_Phyout24, m_Phyout24);
-    DDX_Text(pDX, IDC_EDIT_Phyout25, m_Phyout25);
-    DDX_Text(pDX, IDC_EDIT_Phyout26, m_Phyout26);
-    DDX_Text(pDX, IDC_EDIT_Phyout27, m_Phyout27);
-    DDX_Text(pDX, IDC_EDIT_Phyout28, m_Phyout28);
-    DDX_Text(pDX, IDC_EDIT_Phyout29, m_Phyout29);
-    DDX_Text(pDX, IDC_EDIT_Phyout30, m_Phyout30);
-    DDX_Text(pDX, IDC_EDIT_Phyout31, m_Phyout31);
     DDX_Text(pDX, IDC_EDIT_Para00, m_Para00);
     DDX_Text(pDX, IDC_EDIT_Para01, m_Para01);
     DDX_Text(pDX, IDC_EDIT_Para02, m_Para02);
@@ -443,38 +378,22 @@ void CDigitShowBasicView::ShowData()
 {
     DigitShowContext* ctx = GetContext();
 
-    m_Vout00.Format("%11.4f",ctx->Vout[0]);
-    m_Vout01.Format("%11.4f",ctx->Vout[1]);
-    m_Vout02.Format("%11.4f",ctx->Vout[2]);
-    m_Vout03.Format("%11.4f",ctx->Vout[3]);
-    m_Vout04.Format("%11.4f",ctx->Vout[4]);
-    m_Vout05.Format("%11.4f",ctx->Vout[5]);
-    m_Vout06.Format("%11.4f",ctx->Vout[6]);
-    m_Vout07.Format("%11.4f",ctx->Vout[7]);
-    m_Vout08.Format("%11.4f",ctx->Vout[8]);
-    m_Vout09.Format("%11.4f",ctx->Vout[9]);
-    m_Vout10.Format("%11.4f",ctx->Vout[10]);
-    m_Vout11.Format("%11.4f",ctx->Vout[11]);
-    m_Vout12.Format("%11.4f",ctx->Vout[12]);
-    m_Vout13.Format("%11.4f",ctx->Vout[13]);
-    m_Vout14.Format("%11.4f",ctx->Vout[14]);
-    m_Vout15.Format("%11.4f",ctx->Vout[15]);
-    m_Vout16.Format("%11.4f",ctx->Vout[16]);
-    m_Vout17.Format("%11.4f",ctx->Vout[17]);
-    m_Vout18.Format("%11.4f",ctx->Vout[18]);
-    m_Vout19.Format("%11.4f",ctx->Vout[19]);
-    m_Vout20.Format("%11.4f",ctx->Vout[20]);
-    m_Vout21.Format("%11.4f",ctx->Vout[21]);
-    m_Vout22.Format("%11.4f",ctx->Vout[22]);
-    m_Vout23.Format("%11.4f",ctx->Vout[23]);
-    m_Vout24.Format("%11.4f",ctx->Vout[24]);
-    m_Vout25.Format("%11.4f",ctx->Vout[25]);
-    m_Vout26.Format("%11.4f",ctx->Vout[26]);
-    m_Vout27.Format("%11.4f",ctx->Vout[27]);
-    m_Vout28.Format("%11.4f",ctx->Vout[28]);
-    m_Vout29.Format("%11.4f",ctx->Vout[29]);
-    m_Vout30.Format("%11.4f",ctx->Vout[30]);
-    m_Vout31.Format("%11.4f",ctx->Vout[31]);
+    m_Vout00.Format("%11.0f",ctx->Vout[0]);
+    m_Vout01.Format("%11.0f",ctx->Vout[1]);
+    m_Vout02.Format("%11.0f",ctx->Vout[2]);
+    m_Vout03.Format("%11.0f",ctx->Vout[3]);
+    m_Vout04.Format("%11.0f",ctx->Vout[4]);
+    m_Vout05.Format("%11.0f",ctx->Vout[5]);
+    m_Vout06.Format("%11.0f",ctx->Vout[6]);
+    m_Vout07.Format("%11.0f",ctx->Vout[7]);
+    m_Vout08.Format("%11.0f",ctx->Vout[8]);
+    m_Vout09.Format("%11.0f",ctx->Vout[9]);
+    m_Vout10.Format("%11.0f",ctx->Vout[10]);
+    m_Vout11.Format("%11.0f",ctx->Vout[11]);
+    m_Vout12.Format("%11.0f",ctx->Vout[12]);
+    m_Vout13.Format("%11.0f",ctx->Vout[13]);
+    m_Vout14.Format("%11.0f",ctx->Vout[14]);
+    m_Vout15.Format("%11.0f",ctx->Vout[15]);
 
     m_Phyout00.Format("%11.4f",ctx->Phyout[0]);
     m_Phyout01.Format("%11.4f",ctx->Phyout[1]);
@@ -492,22 +411,6 @@ void CDigitShowBasicView::ShowData()
     m_Phyout13.Format("%11.4f",ctx->Phyout[13]);
     m_Phyout14.Format("%11.4f",ctx->Phyout[14]);
     m_Phyout15.Format("%11.4f",ctx->Phyout[15]);
-    m_Phyout16.Format("%11.4f",ctx->Phyout[16]);
-    m_Phyout17.Format("%11.4f",ctx->Phyout[17]);
-    m_Phyout18.Format("%11.4f",ctx->Phyout[18]);
-    m_Phyout19.Format("%11.4f",ctx->Phyout[19]);
-    m_Phyout20.Format("%11.4f",ctx->Phyout[20]);
-    m_Phyout21.Format("%11.4f",ctx->Phyout[21]);
-    m_Phyout22.Format("%11.4f",ctx->Phyout[22]);
-    m_Phyout23.Format("%11.4f",ctx->Phyout[23]);
-    m_Phyout24.Format("%11.4f",ctx->Phyout[24]);
-    m_Phyout25.Format("%11.4f",ctx->Phyout[25]);
-    m_Phyout26.Format("%11.4f",ctx->Phyout[26]);
-    m_Phyout27.Format("%11.4f",ctx->Phyout[27]);
-    m_Phyout28.Format("%11.4f",ctx->Phyout[28]);
-    m_Phyout29.Format("%11.4f",ctx->Phyout[29]);
-    m_Phyout30.Format("%11.4f",ctx->Phyout[30]);
-    m_Phyout31.Format("%11.4f",ctx->Phyout[31]);
 
     m_Para00.Format("%11.4f",ctx->CalParam[0]);
     m_Para01.Format("%11.4f",ctx->CalParam[1]);
