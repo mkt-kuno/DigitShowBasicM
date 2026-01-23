@@ -42,7 +42,6 @@ private:
     int nResult;
 
 protected:
-    afx_msg void OnBoardSettings();
     afx_msg void OnCalibrationFactor();
     afx_msg void OnSpecimenData();
     afx_msg void OnDAVout();
@@ -54,7 +53,6 @@ protected:
     afx_msg void OnControlSensitivity();
     afx_msg void OnControlCLoading();
     afx_msg void OnControlFile();
-    afx_msg void OnSamplingSettings();
     afx_msg void OnControlPreConsolidation();
     afx_msg void OnTransAdjustment();
     afx_msg void OnControlLinearStressPath();

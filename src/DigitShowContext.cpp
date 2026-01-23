@@ -35,17 +35,6 @@ DigitShowContext* GetContext()
 void InitContext(DigitShowContext* ctx)
 {
     if (ctx == nullptr) return;
-
-    // Initialize board counts
-    ctx->NumAD = 1;
-    ctx->NumDA = 0;
-    ctx->AdMaxChannels = 0;
-
-    // Initialize A/D board config
-    memset(&ctx->ad, 0, sizeof(ctx->ad));
-    
-    // Initialize D/A board config
-    memset(&ctx->da, 0, sizeof(ctx->da));
     
     // Initialize D/A channel assignments
     ctx->daChannel.Motor = 0;
@@ -58,13 +47,10 @@ void InitContext(DigitShowContext* ctx)
     ctx->sampling.SavingTime = 300;
     ctx->sampling.TotalSamplingTimes = 0;
     ctx->sampling.CurrentSamplingTimes = 0;
-    ctx->sampling.AllocatedMemory = 0.0f;
-    ctx->sampling.AvSmplNum = 20;
 
     // Initialize flags
     ctx->FlagSetBoard = false;
     ctx->FlagSaveData = false;
-    ctx->FlagFIFO = false;
     ctx->FlagCyclic = false;
     ctx->FlagCtrl = false;
 
@@ -124,7 +110,7 @@ void InitContext(DigitShowContext* ctx)
     // Note: CString TextString, CTime, CTimeSpan are default-constructed by C++ runtime
 
     // Initialize calibration factors (default: linear y = x)
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < ModbusRTU::AI_CHANNELS; i++) {
         ctx->Vout[i] = 0.0f;
         ctx->Phyout[i] = 0.0;
         ctx->CalParam[i] = 0.0;
@@ -134,7 +120,7 @@ void InitContext(DigitShowContext* ctx)
     }
 
     // Initialize D/A output
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < ModbusRTU::AO_CHANNELS; i++) {
         ctx->DAVout[i] = 0.0f;
         ctx->cal.DA_a[i] = 0.0;
         ctx->cal.DA_b[i] = 0.0;

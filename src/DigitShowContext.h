@@ -22,6 +22,9 @@
 #pragma once
 
 #include <afxwin.h>
+#include "ModbusRTU.h"
+
+#define NUM_PARAM_MAX 16
 
 /**
  * Specimen data structure
@@ -68,46 +71,14 @@ struct ControlData {
 };
 
 /**
- * A/D Board configuration
- */
-struct AdBoardConfig {
-    short  Id[2];
-    short  Channels[2];
-    short  Range[2];
-    float  RangeMax[2];
-    float  RangeMin[2];
-    short  Resolution[2];
-    short  InputMethod[2];
-    short  MemoryType[2];
-    float  SamplingClock[2];
-    long   SamplingTimes[2];
-    float  ScanClock[2];
-    long   Data0[262144];
-    long   Data1[262144];
-};
-
-/**
- * D/A Board configuration
- */
-struct DaBoardConfig {
-    short  Id[1];
-    short  Channels[1];
-    short  Range[1];
-    float  RangeMax[1];
-    float  RangeMin[1];
-    short  Resolution[1];
-    long   Data[8];
-};
-
-/**
  * Calibration data
  */
 struct CalibrationData {
-    double a[64];
-    double b[64];
-    double c[64];
-    double DA_a[8];
-    double DA_b[8];
+    double a[ModbusRTU::AI_CHANNELS];
+    double b[ModbusRTU::AI_CHANNELS];
+    double c[ModbusRTU::AI_CHANNELS];
+    double DA_a[ModbusRTU::AO_CHANNELS];
+    double DA_b[ModbusRTU::AO_CHANNELS];
 };
 
 /**
@@ -183,8 +154,6 @@ struct SamplingSettings {
     int   SavingTime;
     long  TotalSamplingTimes;
     long  CurrentSamplingTimes;
-    float AllocatedMemory;
-    int   AvSmplNum;
 };
 
 /**
@@ -205,24 +174,22 @@ struct ErrorTolerance {
  */
 struct DigitShowContext {
     // Board configuration
-    int NumAD;
-    int NumDA;
-    AdBoardConfig ad;
-    DaBoardConfig da;
+
+    int16_t ai_raw[ModbusRTU::AI_CHANNELS];
+    uint16_t ao_raw[ModbusRTU::AO_CHANNELS];
     DaChannelAssign daChannel;
-    int AdMaxChannels;
 
     // Sampling and calibration
     SamplingSettings sampling;
     CalibrationData cal;
 
     // Measurement data
-    float  Vout[64];
+    float  Vout[ModbusRTU::AI_CHANNELS];
     float  Vtmp;
-    double Phyout[64];
+    double Phyout[ModbusRTU::AI_CHANNELS];
     double Ptmp;
-    double CalParam[64];
-    float  DAVout[8];
+    double CalParam[NUM_PARAM_MAX];
+    float  DAVout[ModbusRTU::AO_CHANNELS];
 
     // Physical values
     PhysicalValues phys;
@@ -247,7 +214,6 @@ struct DigitShowContext {
     // System flags
     bool FlagSetBoard;
     bool FlagSaveData;
-    bool FlagFIFO;
     bool FlagCtrl;
     bool FlagCyclic;
 

@@ -21,8 +21,6 @@
 #include "DigitShowBasicDoc.h"
 
 #include "MainFrm.h"
-#include "BoardSettings.h"
-#include "SamplingSettings.h"
 #include "CalibrationFactor.h"
 #include "Specimen.h"
 #include "TransAdjustment.h"
@@ -51,7 +49,6 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     //{{AFX_MSG_MAP(CMainFrame)
-    ON_COMMAND(ID_BoardSettings, OnBoardSettings)
     ON_COMMAND(ID_Calibration_Factor, OnCalibrationFactor)
     ON_COMMAND(ID_SpecimenData, OnSpecimenData)
     ON_COMMAND(ID_DA_Vout, OnDAVout)
@@ -63,7 +60,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     ON_COMMAND(ID_Control_Sensitivity, OnControlSensitivity)
     ON_COMMAND(ID_Control_CLoading, OnControlCLoading)
     ON_COMMAND(ID_Control_File, OnControlFile)
-    ON_COMMAND(ID_SamplingSettings, OnSamplingSettings)
     ON_COMMAND(ID_Control_PreConsolidation, OnControlPreConsolidation)
     ON_COMMAND(ID_TransAdjustment, OnTransAdjustment)
     ON_COMMAND(ID_Control_LinearStressPath, OnControlLinearStressPath)
@@ -120,22 +116,6 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame メッセージ ハンドラ
-
-void CMainFrame::OnBoardSettings() 
-{
-
-        CBoardSettings BoardSettings;
-        nResult = BoardSettings.DoModal();
-        // Display a device open dialog.
-}
-
-void CMainFrame::OnSamplingSettings() 
-{
-
-        CSamplingSettings SamplingSettings;
-        nResult = SamplingSettings.DoModal();
-        // Display a device open dialog.
-}
 
 void CMainFrame::OnCalibrationFactor() 
 {

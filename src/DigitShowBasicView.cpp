@@ -24,8 +24,11 @@
 #include "DigitShowBasicDoc.h"
 #include "DigitShowBasicView.h"
 
-#include "caio.h"
-#include "SamplingSettings.h"
+#include "ModbusRTU.h"
+
+// NOTE: CAIO dependency has been replaced with ModbusRTU
+// The FIFO/buffer-based sampling is no longer used.
+// Modbus RTU reads are done directly every 100ms via Timer.
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -45,9 +48,6 @@ BEGIN_MESSAGE_MAP(CDigitShowBasicView, CFormView)
     ON_BN_CLICKED(IDC_BUTTON_StopSave, OnBUTTONStopSave)
     ON_WM_DESTROY()
     ON_BN_CLICKED(IDC_BUTTON_InterceptSave, OnBUTTONInterceptSave)
-    ON_BN_CLICKED(IDC_BUTTON_FIFOStart, OnBUTTONFIFOStart)
-    ON_BN_CLICKED(IDC_BUTTON_FIFOStop, OnBUTTONFIFOStop)
-    ON_BN_CLICKED(IDC_BUTTON_WriteData, OnBUTTONWriteData)
     ON_BN_CLICKED(IDC_BUTTON_SetCtrlID, OnBUTTONSetCtrlID)
     ON_BN_CLICKED(IDC_BUTTON_SetTimeInterval, OnBUTTONSetTimeInterval)
     //}}AFX_MSG_MAP
@@ -77,22 +77,6 @@ CDigitShowBasicView::CDigitShowBasicView()
     m_Vout13 = _T("");
     m_Vout14 = _T("");
     m_Vout15 = _T("");
-    m_Vout16 = _T("");
-    m_Vout17 = _T("");
-    m_Vout18 = _T("");
-    m_Vout19 = _T("");
-    m_Vout20 = _T("");
-    m_Vout21 = _T("");
-    m_Vout22 = _T("");
-    m_Vout23 = _T("");
-    m_Vout24 = _T("");
-    m_Vout25 = _T("");
-    m_Vout26 = _T("");
-    m_Vout27 = _T("");
-    m_Vout28 = _T("");
-    m_Vout29 = _T("");
-    m_Vout30 = _T("");
-    m_Vout31 = _T("");
     m_Phyout00 = _T("");
     m_Phyout01 = _T("");
     m_Phyout02 = _T("");
@@ -109,22 +93,6 @@ CDigitShowBasicView::CDigitShowBasicView()
     m_Phyout13 = _T("");
     m_Phyout14 = _T("");
     m_Phyout15 = _T("");
-    m_Phyout16 = _T("");
-    m_Phyout17 = _T("");
-    m_Phyout18 = _T("");
-    m_Phyout19 = _T("");
-    m_Phyout20 = _T("");
-    m_Phyout21 = _T("");
-    m_Phyout22 = _T("");
-    m_Phyout23 = _T("");
-    m_Phyout24 = _T("");
-    m_Phyout25 = _T("");
-    m_Phyout26 = _T("");
-    m_Phyout27 = _T("");
-    m_Phyout28 = _T("");
-    m_Phyout29 = _T("");
-    m_Phyout30 = _T("");
-    m_Phyout31 = _T("");
     m_Para00 = _T("");
     m_Para01 = _T("");
     m_Para02 = _T("");
@@ -180,22 +148,6 @@ void CDigitShowBasicView::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_Vout13, m_Vout13);
     DDX_Text(pDX, IDC_EDIT_Vout14, m_Vout14);
     DDX_Text(pDX, IDC_EDIT_Vout15, m_Vout15);
-    DDX_Text(pDX, IDC_EDIT_Vout16, m_Vout16);
-    DDX_Text(pDX, IDC_EDIT_Vout17, m_Vout17);
-    DDX_Text(pDX, IDC_EDIT_Vout18, m_Vout18);
-    DDX_Text(pDX, IDC_EDIT_Vout19, m_Vout19);
-    DDX_Text(pDX, IDC_EDIT_Vout20, m_Vout20);
-    DDX_Text(pDX, IDC_EDIT_Vout21, m_Vout21);
-    DDX_Text(pDX, IDC_EDIT_Vout22, m_Vout22);
-    DDX_Text(pDX, IDC_EDIT_Vout23, m_Vout23);
-    DDX_Text(pDX, IDC_EDIT_Vout24, m_Vout24);
-    DDX_Text(pDX, IDC_EDIT_Vout25, m_Vout25);
-    DDX_Text(pDX, IDC_EDIT_Vout26, m_Vout26);
-    DDX_Text(pDX, IDC_EDIT_Vout27, m_Vout27);
-    DDX_Text(pDX, IDC_EDIT_Vout28, m_Vout28);
-    DDX_Text(pDX, IDC_EDIT_Vout29, m_Vout29);
-    DDX_Text(pDX, IDC_EDIT_Vout30, m_Vout30);
-    DDX_Text(pDX, IDC_EDIT_Vout31, m_Vout31);
     DDX_Text(pDX, IDC_EDIT_Phyout00, m_Phyout00);
     DDX_Text(pDX, IDC_EDIT_Phyout01, m_Phyout01);
     DDX_Text(pDX, IDC_EDIT_Phyout02, m_Phyout02);
@@ -212,22 +164,6 @@ void CDigitShowBasicView::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_Phyout13, m_Phyout13);
     DDX_Text(pDX, IDC_EDIT_Phyout14, m_Phyout14);
     DDX_Text(pDX, IDC_EDIT_Phyout15, m_Phyout15);
-    DDX_Text(pDX, IDC_EDIT_Phyout16, m_Phyout16);
-    DDX_Text(pDX, IDC_EDIT_Phyout17, m_Phyout17);
-    DDX_Text(pDX, IDC_EDIT_Phyout18, m_Phyout18);
-    DDX_Text(pDX, IDC_EDIT_Phyout19, m_Phyout19);
-    DDX_Text(pDX, IDC_EDIT_Phyout20, m_Phyout20);
-    DDX_Text(pDX, IDC_EDIT_Phyout21, m_Phyout21);
-    DDX_Text(pDX, IDC_EDIT_Phyout22, m_Phyout22);
-    DDX_Text(pDX, IDC_EDIT_Phyout23, m_Phyout23);
-    DDX_Text(pDX, IDC_EDIT_Phyout24, m_Phyout24);
-    DDX_Text(pDX, IDC_EDIT_Phyout25, m_Phyout25);
-    DDX_Text(pDX, IDC_EDIT_Phyout26, m_Phyout26);
-    DDX_Text(pDX, IDC_EDIT_Phyout27, m_Phyout27);
-    DDX_Text(pDX, IDC_EDIT_Phyout28, m_Phyout28);
-    DDX_Text(pDX, IDC_EDIT_Phyout29, m_Phyout29);
-    DDX_Text(pDX, IDC_EDIT_Phyout30, m_Phyout30);
-    DDX_Text(pDX, IDC_EDIT_Phyout31, m_Phyout31);
     DDX_Text(pDX, IDC_EDIT_Para00, m_Para00);
     DDX_Text(pDX, IDC_EDIT_Para01, m_Para01);
     DDX_Text(pDX, IDC_EDIT_Para02, m_Para02);
@@ -295,13 +231,9 @@ void CDigitShowBasicView::OnInitialUpdate()
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_CtrlOff);
     CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);
     CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
-    CButton* myBTN4 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);
-    CButton* myBTN5 = (CButton*)GetDlgItem(IDC_BUTTON_WriteData);
     myBTN1->EnableWindow(FALSE);
     myBTN2->EnableWindow(FALSE);
     myBTN3->EnableWindow(FALSE);
-    myBTN4->EnableWindow(FALSE);
-    myBTN5->EnableWindow(FALSE);
     CString tmp;
     CComboBox* m_Combo1 = (CComboBox*)GetDlgItem(IDC_COMBO_Control_ID);
     m_Combo1->InsertString(-1,"0");
@@ -339,39 +271,13 @@ void CDigitShowBasicView::OnInitialUpdate()
     m_Combo2->SetWindowText("1.0 s");
     CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
     pDoc->OpenBoard();
-    if(ctx->FlagSetBoard){
-        if(ctx->NumAD>0)    {
-            Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-            Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-
-            AiScanClocka = 60.0;
-            Ret = AioSetAiScanClock(ctx->ad.Id[0], AiScanClocka);
-
-            ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-            Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-            Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-            Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-            Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        }
-        if(ctx->NumAD>1)    {
-            Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-            Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-
-            AiScanClocka = 60.0;
-            Ret = AioSetAiScanClock(ctx->ad.Id[1], AiScanClocka);
-
-            ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-            Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-            Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-            Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-            Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        }
-        ctx->AdEvent = AIE_DATA_NUM | AIE_OFERR | AIE_SCERR | AIE_ADERR;
-        Ret = AioSetAiEvent(ctx->ad.Id[ctx->NumAD-1], m_hWnd, ctx->AdEvent);
-        Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-    }
+    
+    // For Modbus RTU, no CAIO-style event sampling setup is needed.
+    // The timer-based polling at 100ms interval reads data directly.
+    // Set Timer 1 interval to 100ms as per Modbus RTU requirements.
+    // NOTE: Timer interval could be made configurable if different polling rates are needed.
+    ctx->timeSettings.Interval1 = 100;  // 100ms for Modbus RTU AI polling
+    
     SetTimer(1,ctx->timeSettings.Interval1,NULL);    
 }
 
@@ -416,13 +322,22 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
     {
     case 1:
         { 
+            // Timer 1: 100ms interval for Modbus RTU
+            // 1. Read AI via ReadInputRegisters
+            // 2. Process calibration and calculate physical values
+            // 3. Write AO via WriteHoldingRegisters (only if changed)
             ctx->NowTime = ctx->NowTime.GetCurrentTime();
             ctx->SNowTime = ctx->NowTime.Format("%m/%d  %H:%M:%S");
             if(ctx->FlagSaveData){
                 ctx->SpanTime = ctx->NowTime- ctx->StartTime;
                 ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
             }    
-            if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+            if(ctx->FlagSetBoard) {
+                pDoc -> AD_INPUT();
+                // Modbus: AO output is triggered after AI read
+                // DA_OUTPUT will only write if values have changed
+                pDoc -> DA_OUTPUT();
+            }
             pDoc -> Cal_Physical();
             pDoc -> Cal_Param();
             ShowData();
@@ -430,6 +345,9 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
         break;
     case 2:
         { 
+            // Timer 2: Control feedback loop
+            // Control_DA sets the DAVout values based on control logic
+            // DA_OUTPUT is called inside Control_DA, but also triggered by Timer 1
             _ftime_s(&StepTime1);
             if(ctx->FlagCtrl==FALSE){
                 StepTime0 = StepTime1;
@@ -442,9 +360,11 @@ void CDigitShowBasicView::OnTimer(UINT_PTR nIDEvent)
         break;
     case 3:
         { 
+            // Timer 3: Data save timer (min 200ms interval)
+            // Uses cached data from Timer 1 (100ms) - no Modbus communication here
             _ftime_s(&NowTime2);
             ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
-            if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
+            // Note: Cal_Physical and Cal_Param use cached Vout values from Timer 1
             pDoc -> Cal_Physical();
             pDoc -> Cal_Param();
             pDoc -> SaveToFile();
@@ -458,38 +378,22 @@ void CDigitShowBasicView::ShowData()
 {
     DigitShowContext* ctx = GetContext();
 
-    m_Vout00.Format("%11.4f",ctx->Vout[0]);
-    m_Vout01.Format("%11.4f",ctx->Vout[1]);
-    m_Vout02.Format("%11.4f",ctx->Vout[2]);
-    m_Vout03.Format("%11.4f",ctx->Vout[3]);
-    m_Vout04.Format("%11.4f",ctx->Vout[4]);
-    m_Vout05.Format("%11.4f",ctx->Vout[5]);
-    m_Vout06.Format("%11.4f",ctx->Vout[6]);
-    m_Vout07.Format("%11.4f",ctx->Vout[7]);
-    m_Vout08.Format("%11.4f",ctx->Vout[8]);
-    m_Vout09.Format("%11.4f",ctx->Vout[9]);
-    m_Vout10.Format("%11.4f",ctx->Vout[10]);
-    m_Vout11.Format("%11.4f",ctx->Vout[11]);
-    m_Vout12.Format("%11.4f",ctx->Vout[12]);
-    m_Vout13.Format("%11.4f",ctx->Vout[13]);
-    m_Vout14.Format("%11.4f",ctx->Vout[14]);
-    m_Vout15.Format("%11.4f",ctx->Vout[15]);
-    m_Vout16.Format("%11.4f",ctx->Vout[16]);
-    m_Vout17.Format("%11.4f",ctx->Vout[17]);
-    m_Vout18.Format("%11.4f",ctx->Vout[18]);
-    m_Vout19.Format("%11.4f",ctx->Vout[19]);
-    m_Vout20.Format("%11.4f",ctx->Vout[20]);
-    m_Vout21.Format("%11.4f",ctx->Vout[21]);
-    m_Vout22.Format("%11.4f",ctx->Vout[22]);
-    m_Vout23.Format("%11.4f",ctx->Vout[23]);
-    m_Vout24.Format("%11.4f",ctx->Vout[24]);
-    m_Vout25.Format("%11.4f",ctx->Vout[25]);
-    m_Vout26.Format("%11.4f",ctx->Vout[26]);
-    m_Vout27.Format("%11.4f",ctx->Vout[27]);
-    m_Vout28.Format("%11.4f",ctx->Vout[28]);
-    m_Vout29.Format("%11.4f",ctx->Vout[29]);
-    m_Vout30.Format("%11.4f",ctx->Vout[30]);
-    m_Vout31.Format("%11.4f",ctx->Vout[31]);
+    m_Vout00.Format("%11.0f",ctx->Vout[0]);
+    m_Vout01.Format("%11.0f",ctx->Vout[1]);
+    m_Vout02.Format("%11.0f",ctx->Vout[2]);
+    m_Vout03.Format("%11.0f",ctx->Vout[3]);
+    m_Vout04.Format("%11.0f",ctx->Vout[4]);
+    m_Vout05.Format("%11.0f",ctx->Vout[5]);
+    m_Vout06.Format("%11.0f",ctx->Vout[6]);
+    m_Vout07.Format("%11.0f",ctx->Vout[7]);
+    m_Vout08.Format("%11.0f",ctx->Vout[8]);
+    m_Vout09.Format("%11.0f",ctx->Vout[9]);
+    m_Vout10.Format("%11.0f",ctx->Vout[10]);
+    m_Vout11.Format("%11.0f",ctx->Vout[11]);
+    m_Vout12.Format("%11.0f",ctx->Vout[12]);
+    m_Vout13.Format("%11.0f",ctx->Vout[13]);
+    m_Vout14.Format("%11.0f",ctx->Vout[14]);
+    m_Vout15.Format("%11.0f",ctx->Vout[15]);
 
     m_Phyout00.Format("%11.4f",ctx->Phyout[0]);
     m_Phyout01.Format("%11.4f",ctx->Phyout[1]);
@@ -507,22 +411,6 @@ void CDigitShowBasicView::ShowData()
     m_Phyout13.Format("%11.4f",ctx->Phyout[13]);
     m_Phyout14.Format("%11.4f",ctx->Phyout[14]);
     m_Phyout15.Format("%11.4f",ctx->Phyout[15]);
-    m_Phyout16.Format("%11.4f",ctx->Phyout[16]);
-    m_Phyout17.Format("%11.4f",ctx->Phyout[17]);
-    m_Phyout18.Format("%11.4f",ctx->Phyout[18]);
-    m_Phyout19.Format("%11.4f",ctx->Phyout[19]);
-    m_Phyout20.Format("%11.4f",ctx->Phyout[20]);
-    m_Phyout21.Format("%11.4f",ctx->Phyout[21]);
-    m_Phyout22.Format("%11.4f",ctx->Phyout[22]);
-    m_Phyout23.Format("%11.4f",ctx->Phyout[23]);
-    m_Phyout24.Format("%11.4f",ctx->Phyout[24]);
-    m_Phyout25.Format("%11.4f",ctx->Phyout[25]);
-    m_Phyout26.Format("%11.4f",ctx->Phyout[26]);
-    m_Phyout27.Format("%11.4f",ctx->Phyout[27]);
-    m_Phyout28.Format("%11.4f",ctx->Phyout[28]);
-    m_Phyout29.Format("%11.4f",ctx->Phyout[29]);
-    m_Phyout30.Format("%11.4f",ctx->Phyout[30]);
-    m_Phyout31.Format("%11.4f",ctx->Phyout[31]);
 
     m_Para00.Format("%11.4f",ctx->CalParam[0]);
     m_Para01.Format("%11.4f",ctx->CalParam[1]);
@@ -545,7 +433,6 @@ void CDigitShowBasicView::ShowData()
     m_NowTime = ctx->SNowTime;
     m_SeqTime = ctx->SequentTime1;
     m_SamplingTime = ctx->timeSettings.Interval3;
-    if(ctx->FlagFIFO) m_SamplingTime = long(ctx->ad.SamplingClock[0]/1.0E+03);
     UpdateData(FALSE);
 }
 
@@ -582,318 +469,13 @@ void CDigitShowBasicView::OnBUTTONStartSave()
 {
     DigitShowContext* ctx = GetContext();
 
-    long        Ret;
     CString    TmpString;
     errno_t err;
     CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
 
-    if(ctx->FlagFIFO==FALSE){
-        CString    pFileName0, pFileName1, pFileName2;
-        CFileDialog SaveFile_dlg( FALSE, NULL, "*.dat",  OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT,
-                "Data Files(*.dat)|*.dat| All Files(*.*)|*.*| |",NULL);
-        if (SaveFile_dlg.DoModal()==IDOK){
-            // File for saving the physical data 
-            pFileName1 = SaveFile_dlg.GetPathName();    
-            m_FileName =    SaveFile_dlg.GetFileTitle();
-            TmpString = SaveFile_dlg.GetFileExt();    
-            if(TmpString == "" ){
-                TmpString =".dat";
-                pFileName1 = pFileName1+TmpString;
-                m_FileName = m_FileName+TmpString;
-            }
-            else if(TmpString != "dat"){
-                TmpString = _T(".")+TmpString;
-                pFileName1.Replace(TmpString,".dat");
-                m_FileName = m_FileName+_T(".dat");
-            }
-            if((err = fopen_s(&ctx->FileSaveData1,(LPCSTR)pFileName1, _T("w"))) == 0)
-            {
-                fprintf(ctx->FileSaveData1,"%s    ","Time(s)");
-                fprintf(ctx->FileSaveData1,"%s    ","Load_(N)");
-                fprintf(ctx->FileSaveData1,"%s    ","Disp.(mm)");
-                fprintf(ctx->FileSaveData1,"%s    ","Cell_P.(kPa)");
-                fprintf(ctx->FileSaveData1,"%s    ","ECellP.(kPa)");
-                fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(mm3)");
-                fprintf(ctx->FileSaveData1,"%s    ","V-LDT1_(mm)");
-                fprintf(ctx->FileSaveData1,"%s    ","V-LDT2_(mm)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH07_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH08_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH09_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH10_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH11_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH12_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH13_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH14_(V)");
-                fprintf(ctx->FileSaveData1,"%s    ","CH15_(V)");
-                fprintf(ctx->FileSaveData1,"\n");
-            }
-
-
-            // File for saving the voltage data
-            pFileName0 = pFileName1;
-            pFileName0.Replace(".dat",".vlt");
-            if((err = fopen_s(&ctx->FileSaveData0,(LPCSTR)pFileName0, _T("w"))) == 0)
-            {
-                fprintf(ctx->FileSaveData0,"%s    ","Time(s)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH00_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH01_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH02_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH03_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH04_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH05_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH06_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH07_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH08_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH09_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH10_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH11_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH12_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH13_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH14_(V)");
-                fprintf(ctx->FileSaveData0,"%s    ","CH15_(V)");
-                fprintf(ctx->FileSaveData0,"\n");
-            }
-
-
-            // File for saving the parameter data
-            pFileName2 = pFileName1;
-            pFileName2.Replace(".dat",".out");
-            if((err = fopen_s(&ctx->FileSaveData2,(LPCSTR)pFileName2, _T("w"))) == 0)
-            {
-                fprintf(ctx->FileSaveData2,"%s    ","Time(s)");
-                fprintf(ctx->FileSaveData2,"%s    ","s(a)_(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","s(r)_(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","s'(a)(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","s'(r)(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","Pore_(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","p____(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","q____(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","p'___(kPa)");
-                fprintf(ctx->FileSaveData2,"%s    ","e(a)_(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","e(r)_(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","e(v)_(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","eLDT1(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","eLDT2(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","AvLDT(%)_");
-                fprintf(ctx->FileSaveData2,"%s    ","(s'a+s'r)/2");
-                fprintf(ctx->FileSaveData2,"%s    ","(s'a-s'r)/2");
-                fprintf(ctx->FileSaveData2,"\n");
-            }
-// Timer starts
-            SetTimer(3,ctx->timeSettings.Interval3,NULL);
-            ctx->NowTime = ctx->NowTime.GetCurrentTime();
-            ctx->StartTime = ctx->NowTime;
-            ctx->SpanTime = ctx->NowTime- ctx->StartTime;
-            ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
-            _ftime_s(&NowTime2);
-            StartTime2 = NowTime2;
-            ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
-            ctx->FlagSaveData = TRUE;
-            CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
-            CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);
-            CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
-            CButton* myBTN4 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-            CButton* myBTN5 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);
-            myBTN1->EnableWindow(FALSE);    
-            myBTN2->EnableWindow(TRUE);
-            myBTN3->EnableWindow(TRUE);
-            myBTN4->EnableWindow(FALSE);
-            myBTN5->EnableWindow(FALSE);
-            if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
-            pDoc -> Cal_Physical();
-            pDoc -> Cal_Param();
-            pDoc -> SaveToFile();
-        }
-    }
-    if(ctx->FlagSetBoard==TRUE && ctx->FlagFIFO==TRUE){
-        ctx->NowTime = ctx->NowTime.GetCurrentTime();
-        ctx->StartTime = ctx->NowTime;
-        ctx->SpanTime = ctx->NowTime- ctx->StartTime;
-        ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-        if(ctx->NumAD>2) Ret = AioStopAi(ctx->ad.Id[2]);
-        ctx->FlagSaveData = TRUE;
-        ctx->sampling.CurrentSamplingTimes = 0;
-        pDoc->Allocate_Memory();
-        CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
-        CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);
-        CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
-        CButton* myBTN4 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-        CButton* myBTN5 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);
-        CButton* myBTN6 = (CButton*)GetDlgItem(IDC_BUTTON_WriteData);
-        myBTN1->EnableWindow(FALSE);    
-        myBTN2->EnableWindow(TRUE);
-        myBTN3->EnableWindow(FALSE);
-        myBTN4->EnableWindow(FALSE);
-        myBTN5->EnableWindow(FALSE);
-        myBTN6->EnableWindow(FALSE);
-        if(ctx->NumAD>0) Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-    }
-}
-
-void CDigitShowBasicView::OnBUTTONStopSave() 
-{
-    DigitShowContext* ctx = GetContext();
-    long    Ret;
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
-
-    if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==FALSE){
-        KillTimer(3);
-        _ftime_s(&NowTime2);
-        ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
-        if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
-        pDoc -> Cal_Physical();
-        pDoc -> Cal_Param();
-        pDoc -> SaveToFile();
-        fclose(ctx->FileSaveData0);
-        fclose(ctx->FileSaveData1);
-        fclose(ctx->FileSaveData2);
-        CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
-        CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);    
-        CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
-        CButton* myBTN4 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-        CButton* myBTN5 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);
-        myBTN1->EnableWindow(TRUE);    
-        myBTN2->EnableWindow(FALSE);
-        myBTN3->EnableWindow(FALSE);    
-        myBTN4->EnableWindow(TRUE);
-        myBTN5->EnableWindow(FALSE);
-        ctx->FlagSaveData = FALSE;
-    }
-    if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==TRUE){
-        ctx->FlagSaveData = FALSE;
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioResetAiMemory(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioResetAiMemory(ctx->ad.Id[1]);
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-        CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
-        CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);    
-        CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
-        CButton* myBTN4 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-        CButton* myBTN5 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);
-        CButton* myBTN6 = (CButton*)GetDlgItem(IDC_BUTTON_WriteData);
-        myBTN1->EnableWindow(TRUE);    
-        myBTN2->EnableWindow(FALSE);
-        myBTN3->EnableWindow(FALSE);    
-        myBTN4->EnableWindow(FALSE);
-        myBTN5->EnableWindow(TRUE);
-        myBTN6->EnableWindow(TRUE);
-    }
-}
-
-void CDigitShowBasicView::OnBUTTONInterceptSave() 
-{
-    DigitShowContext* ctx = GetContext();
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
-    
-    _ftime_s(&NowTime2);
-    ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );    
-    if(ctx->FlagSetBoard)    pDoc -> AD_INPUT();
-    pDoc -> Cal_Physical();
-    pDoc -> Cal_Param();
-    pDoc -> SaveToFile();    
-}
-
-void CDigitShowBasicView::OnBUTTONFIFOStart() 
-{
-    DigitShowContext* ctx = GetContext();
-    long    Ret;
-    int        nResult;
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
-    CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-    CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);    
-
-    if(ctx->FlagSetBoard==TRUE){
-        if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-        CSamplingSettings SamplingSettings;
-        nResult = SamplingSettings.DoModal();
-        if(nResult==IDOK){
-            if(ctx->NumAD>0)    {
-                Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , ctx->ad.SamplingClock[0] );
-                Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-                Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-                Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-                Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-                Ret = AioResetAiMemory(ctx->ad.Id[0]);
-            }
-            if(ctx->NumAD>1)    {
-                Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , ctx->ad.SamplingClock[1] );
-                Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-                Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-                Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-                Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-                Ret = AioResetAiMemory(ctx->ad.Id[1]);
-            }
-            Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-            ctx->sampling.SavingClock = ctx->ad.SamplingClock[0];
-            ctx->FlagFIFO = TRUE;
-            myBTN1->EnableWindow(FALSE);
-            myBTN2->EnableWindow(TRUE);
-        }
-        if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-        if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-    }
-    else{
-        AfxMessageBox("Board Setting has not been accomplished yet.", MB_OK | MB_ICONSTOP, 0);    
-    }
-}
-
-void CDigitShowBasicView::OnBUTTONFIFOStop() 
-{
-    DigitShowContext* ctx = GetContext();
-    long    Ret;
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
-    CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStart);
-    CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_FIFOStop);    
-    if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-    ctx->FlagFIFO = FALSE;
-    myBTN1->EnableWindow(TRUE);
-    myBTN2->EnableWindow(FALSE);
-    if(ctx->NumAD>0)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-        ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[0]);
-    }
-    if(ctx->NumAD>1)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-        ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[1]);
-    }
-    Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-    if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
-}
-
-void CDigitShowBasicView::OnBUTTONWriteData() 
-{
-    DigitShowContext* ctx = GetContext();
-    long    Ret;
-    if(ctx->NumAD>0) Ret = AioStopAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStopAi(ctx->ad.Id[1]);
-
-    CString    pFileName0, pFileName1,TmpString;
-    CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_WriteData);
-    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
-    errno_t err; 
-
+    CString    pFileName0, pFileName1, pFileName2;
     CFileDialog SaveFile_dlg( FALSE, NULL, "*.dat",  OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT,
-    "Data Files(*.dat)|*.dat| All Files(*.*)|*.*| |",NULL);
+            "Data Files(*.dat)|*.dat| All Files(*.*)|*.*| |",NULL);
     if (SaveFile_dlg.DoModal()==IDOK){
         // File for saving the physical data 
         pFileName1 = SaveFile_dlg.GetPathName();    
@@ -909,16 +491,16 @@ void CDigitShowBasicView::OnBUTTONWriteData()
             pFileName1.Replace(TmpString,".dat");
             m_FileName = m_FileName+_T(".dat");
         }
-        if((err = fopen_s(&ctx->FileSaveData1,(LPCSTR)pFileName1 , _T("w"))) == 0)
+        if((err = fopen_s(&ctx->FileSaveData1,(LPCSTR)pFileName1, _T("w"))) == 0)
         {
             fprintf(ctx->FileSaveData1,"%s    ","Time(s)");
             fprintf(ctx->FileSaveData1,"%s    ","Load_(N)");
             fprintf(ctx->FileSaveData1,"%s    ","Disp.(mm)");
             fprintf(ctx->FileSaveData1,"%s    ","Cell_P.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","E_Cell_P.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(cm3)");
-            fprintf(ctx->FileSaveData1,"%s    ","LDT-V1(mm)");
-            fprintf(ctx->FileSaveData1,"%s    ","LDT-V2(mm)");
+            fprintf(ctx->FileSaveData1,"%s    ","ECellP.(kPa)");
+            fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(mm3)");
+            fprintf(ctx->FileSaveData1,"%s    ","V-LDT1_(mm)");
+            fprintf(ctx->FileSaveData1,"%s    ","V-LDT2_(mm)");
             fprintf(ctx->FileSaveData1,"%s    ","CH07_(V)");
             fprintf(ctx->FileSaveData1,"%s    ","CH08_(V)");
             fprintf(ctx->FileSaveData1,"%s    ","CH09_(V)");
@@ -935,7 +517,7 @@ void CDigitShowBasicView::OnBUTTONWriteData()
         // File for saving the voltage data
         pFileName0 = pFileName1;
         pFileName0.Replace(".dat",".vlt");
-        if((err = fopen_s(&ctx->FileSaveData0,(LPCSTR)pFileName0 , _T("w"))) == 0)
+        if((err = fopen_s(&ctx->FileSaveData0,(LPCSTR)pFileName0, _T("w"))) == 0)
         {
             fprintf(ctx->FileSaveData0,"%s    ","Time(s)");
             fprintf(ctx->FileSaveData0,"%s    ","CH00_(V)");
@@ -956,115 +538,96 @@ void CDigitShowBasicView::OnBUTTONWriteData()
             fprintf(ctx->FileSaveData0,"%s    ","CH15_(V)");
             fprintf(ctx->FileSaveData0,"\n");
         }
-        pDoc -> SaveToFile2();
+
+
+        // File for saving the parameter data
+        pFileName2 = pFileName1;
+        pFileName2.Replace(".dat",".out");
+        if((err = fopen_s(&ctx->FileSaveData2,(LPCSTR)pFileName2, _T("w"))) == 0)
+        {
+            fprintf(ctx->FileSaveData2,"%s    ","Time(s)");
+            fprintf(ctx->FileSaveData2,"%s    ","s(a)_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","s(r)_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","s'(a)(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","s'(r)(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","Pore_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","p____(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","q____(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","p'___(kPa)");
+            fprintf(ctx->FileSaveData2,"%s    ","e(a)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","e(r)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","e(v)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","eLDT1(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","eLDT2(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","AvLDT(%)_");
+            fprintf(ctx->FileSaveData2,"%s    ","(s'a+s'r)/2");
+            fprintf(ctx->FileSaveData2,"%s    ","(s'a-s'r)/2");
+            fprintf(ctx->FileSaveData2,"\n");
+        }
+        // Timer starts
+        SetTimer(3,ctx->timeSettings.Interval3,NULL);
+        ctx->NowTime = ctx->NowTime.GetCurrentTime();
+        ctx->StartTime = ctx->NowTime;
+        ctx->SpanTime = ctx->NowTime- ctx->StartTime;
+        ctx->SequentTime1 = (long)ctx->SpanTime.GetTotalSeconds();
+        _ftime_s(&NowTime2);
+        StartTime2 = NowTime2;
+        ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
+        ctx->FlagSaveData = TRUE;
+        CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
+        CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);
+        CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
+        myBTN1->EnableWindow(FALSE);    
+        myBTN2->EnableWindow(TRUE);
+        myBTN3->EnableWindow(TRUE);
+        // Note: Use cached data from Timer 1 - no Modbus communication here
+        pDoc -> Cal_Physical();
+        pDoc -> Cal_Param();
+        pDoc -> SaveToFile();
+    }
+}
+
+void CDigitShowBasicView::OnBUTTONStopSave() 
+{
+    DigitShowContext* ctx = GetContext();
+    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
+
+    if(ctx->FlagSaveData==TRUE){
+        KillTimer(3);
+        _ftime_s(&NowTime2);
+        ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );
+        // Note: Use cached data from Timer 1 - no Modbus communication here
+        pDoc -> Cal_Physical();
+        pDoc -> Cal_Param();
+        pDoc -> SaveToFile();
         fclose(ctx->FileSaveData0);
         fclose(ctx->FileSaveData1);
-        pDoc -> Allocate_Memory();
-        myBTN1->EnableWindow(FALSE);
+        fclose(ctx->FileSaveData2);
+        CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_StartSave);
+        CButton* myBTN2 = (CButton*)GetDlgItem(IDC_BUTTON_StopSave);    
+        CButton* myBTN3 = (CButton*)GetDlgItem(IDC_BUTTON_InterceptSave);
+        myBTN1->EnableWindow(TRUE);    
+        myBTN2->EnableWindow(FALSE);
+        myBTN3->EnableWindow(FALSE);    
+        ctx->FlagSaveData = FALSE;
     }
-    if(ctx->NumAD>0)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[0] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[0] , &ctx->ad.SamplingClock[0] );
-        ctx->ad.SamplingTimes[0] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[0]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[0] , ctx->ad.SamplingTimes[0] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[0] , &ctx->ad.SamplingTimes[0] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[0], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[0]);
-    }
-    if(ctx->NumAD>1)    {
-        Ret = AioSetAiSamplingClock ( ctx->ad.Id[1] , 1000 );
-        Ret = AioGetAiSamplingClock ( ctx->ad.Id[1] , &ctx->ad.SamplingClock[1] );
-        ctx->ad.SamplingTimes[1] = long(ctx->timeSettings.Interval1*1000/ctx->ad.SamplingClock[1]);
-        Ret = AioSetAiEventSamplingTimes ( ctx->ad.Id[1] , ctx->ad.SamplingTimes[1] );
-        Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[1] , &ctx->ad.SamplingTimes[1] );
-        Ret = AioSetAiStopTrigger(ctx->ad.Id[1], 4);
-        Ret = AioResetAiMemory(ctx->ad.Id[1]);
-    }
-    Ret = AioSetAiEventSamplingTimes(ctx->ad.Id[ctx->NumAD-1], ctx->ad.SamplingTimes[ctx->NumAD-1]);
-    if(ctx->NumAD>0) Ret = AioStartAi(ctx->ad.Id[0]);
-    if(ctx->NumAD>1) Ret = AioStartAi(ctx->ad.Id[1]);
+}
+
+void CDigitShowBasicView::OnBUTTONInterceptSave() 
+{
+    DigitShowContext* ctx = GetContext();
+    CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
+    
+    _ftime_s(&NowTime2);
+    ctx->SequentTime2 = double(NowTime2.time-StartTime2.time)+double( (NowTime2.millitm-StartTime2.millitm)/1000.0 );    
+    // Note: Use cached data from Timer 1 - no Modbus communication here
+    pDoc -> Cal_Physical();
+    pDoc -> Cal_Param();
+    pDoc -> SaveToFile();    
 }
 
 LRESULT CDigitShowBasicView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
-    DigitShowContext* ctx = GetContext();
-    int        i,j;
-    long    tmp,tmp0,tmp1;
-    long    Ret,Ret2;
-
-    switch(message){
-    case AIOM_AIE_DATA_NUM:
-        if(ctx->NumAD>0)    {
-            Ret = AioGetAiSamplingCount ( ctx->ad.Id[0] , &tmp0 );
-            tmp = tmp0;
-        }
-        if(ctx->NumAD>1)    {
-            Ret = AioGetAiSamplingCount ( ctx->ad.Id[1] , &tmp1 );
-            if(tmp>tmp1) tmp = tmp1;
-        }
-        if(ctx->NumAD>0){
-            Ret = AioGetAiSamplingData(ctx->ad.Id[0], &tmp, &ctx->ad.Data0[0]);
-            if(Ret != 0){
-                Ret2 = AioGetErrorString(Ret, ctx->ErrorString);
-                ctx->TextString.Format("AioGetAiSamplingData = %d : %s", Ret, ctx->ErrorString);
-                AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK );
-            }
-        }
-        if(ctx->NumAD>1){
-            Ret = AioGetAiSamplingData(ctx->ad.Id[1], &tmp, &ctx->ad.Data1[0]);
-            if(Ret != 0){
-                Ret2 = AioGetErrorString(Ret, ctx->ErrorString);
-                ctx->TextString.Format("AioGetAiSamplingData = %d : %s", Ret, ctx->ErrorString);
-                AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK );
-            }
-        }
-        if(ctx->FlagSaveData==TRUE && ctx->FlagFIFO==TRUE){
-            for(i = 0;i<tmp;i++){
-                if(ctx->sampling.CurrentSamplingTimes>= ctx->sampling.TotalSamplingTimes) {
-                    OnBUTTONStopSave();
-                }
-                else{
-                    if(ctx->NumAD > 0){
-                        for(j = 0;j<ctx->ad.Channels[0]/2;j++){
-                            *((PLONG)ctx->pSmplData0 + ctx->sampling.CurrentSamplingTimes*ctx->ad.Channels[0]/2+j) = ctx->ad.Data0[i*ctx->ad.Channels[0]+2*j];
-                        }
-                    }
-                    if(ctx->NumAD > 1){
-                        for(j = 0;j<ctx->ad.Channels[1]/2;j++){
-                            *((PLONG)ctx->pSmplData1 + ctx->sampling.CurrentSamplingTimes*ctx->ad.Channels[1]/2+j) = ctx->ad.Data1[i*ctx->ad.Channels[1]+2*j];
-                        }
-                    }
-                    ctx->sampling.CurrentSamplingTimes = ctx->sampling.CurrentSamplingTimes+1;
-                }
-            }
-        }
-        return TRUE;
-    case AIOM_AIE_OFERR:
-        if(ctx->FlagFIFO){
-            AfxMessageBox("FIFO sttoped by the over flow int the memory of A/D board.", MB_OK | MB_ICONSTOP, 0);    
-        }
-        else{
-            if(ctx->NumAD>0){
-                Ret = AioResetAiMemory(ctx->ad.Id[0]);
-                Ret = AioStartAi(ctx->ad.Id[0]);
-            }
-            if(ctx->NumAD>1){
-                Ret = AioResetAiMemory(ctx->ad.Id[1]);
-                Ret = AioStartAi(ctx->ad.Id[1]);
-            }
-            AfxMessageBox("FIFO sttoped by the over flow, but restarted automatically.", MB_OK | MB_ICONSTOP, 0);    
-        }
-        return TRUE;
-    case AIOM_AIE_SCERR:
-        AfxMessageBox("FIFO sttoped by sampling error.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    case AIOM_AIE_ADERR:
-        AfxMessageBox("FIFO sttoped by the error in A/D convert.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    case AIOM_AIE_END:
-        AfxMessageBox("FIFO sttoped to reach the end.", MB_OK | MB_ICONSTOP, 0);    
-        return TRUE;
-    }    
     return CFormView::DefWindowProc(message, wParam, lParam);
 }
 

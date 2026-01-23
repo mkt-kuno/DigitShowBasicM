@@ -48,8 +48,8 @@ BEGIN
     "LANGUAGE 17, 1\r\n"
     "#pragma code_page(932)\r\n"
     "#endif //_WIN32\r\n"
-    "#include ""res\\DigitShowBasic.rc2""  // Microsoft Visual C++ à»äOÇÃÉcÅ[ÉãÇ≈ï“èWÇ≥ÇÍÇΩÉäÉ\Å[ÉX\r\n"
-    "#include ""l.jpn\\afxres.rc""          // ïWèÄÇÃÉRÉìÉ|Å[ÉlÉìÉg\r\n"
+    "#include ""res\\DigitShowBasic.rc2""  // Microsoft Visual C++ ?E?O?I?c?[???A?O?W?3?e?????\\?[?X\r\n"
+    "#include ""l.jpn\\afxres.rc""          // ?W???I?R?Åg?|?[?l?Åg?g\r\n"
     "#endif\r\n"
     "\0"
 END
@@ -65,7 +65,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\DigitShowBasic.ico"
+
 IDR_DIGITSTYPE          ICON                    "res\\DigitShowBasicDoc.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -77,11 +79,6 @@ BEGIN
     POPUP "File(&F)"
     BEGIN
         MENUITEM "Close application(&X)",       ID_APP_EXIT
-    END
-    POPUP "View"
-    BEGIN
-        MENUITEM "Board Settings",              ID_BoardSettings
-        MENUITEM "SamplingSettings",            ID_SamplingSettings
     END
     POPUP "Calibration"
     BEGIN
@@ -158,9 +155,9 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
 
-IDD_DIGITSHOWBASIC_FORM DIALOG 0, 0, 579, 455
+IDD_DIGITSHOWBASIC_FORM DIALOGEX 0, 0, 579, 455
 STYLE DS_SETFONT | WS_CHILD
-FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN"
+FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Voltage OutPut",IDC_STATIC,15,7,548,121
     EDITTEXT        IDC_EDIT_Vout01,93,27,56,15,ES_RIGHT | ES_AUTOHSCROLL
@@ -324,7 +321,6 @@ BEGIN
     LTEXT           "ID_13: No Control,",IDC_STATIC,317,406,52,8
     LTEXT           "ID_14: No Control,",IDC_STATIC,317,420,52,8
     LTEXT           "ID_15: Control from a file.",IDC_STATIC,317,434,75,8
-    PUSHBUTTON      "Intercept Saving",IDC_BUTTON_InterceptSave,460,370,102,14
     EDITTEXT        IDC_EDIT_Phyout25,92,230,56,15,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_Phyout26,158,230,56,14,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_Phyout27,225,230,56,14,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_VISIBLE
@@ -358,9 +354,6 @@ BEGIN
     EDITTEXT        IDC_EDIT_Phyout00,25,153,56,15,ES_RIGHT | ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_Para00,24,275,56,14,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "volumetric strain %",IDC_STATIC,159,293,56,8
-    PUSHBUTTON      "Start FIFO",IDC_BUTTON_FIFOStart,460,388,35,14
-    PUSHBUTTON      "Stop FIFO",IDC_BUTTON_FIFOStop,494,388,34,14
-    PUSHBUTTON      "Write Data",IDC_BUTTON_WriteData,528,388,34,14
     LTEXT           "CH7",IDC_STATIC,512,146,14,8
     GROUPBOX        "Current conditins of sampling and control",IDC_STATIC,14,378,130,64
     LTEXT           "Control ID",IDC_STATIC,20,342,38,10
@@ -368,43 +361,13 @@ BEGIN
     GROUPBOX        "Settings of sampling and control",IDC_STATIC,15,328,130,46
     COMBOBOX        IDC_COMBO_Control_ID,81,338,33,88,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO_SamplingTime,81,355,33,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Intercept Saving",IDC_BUTTON_InterceptSave,460,370,102,14
 END
 
-IDD_BoardSettings DIALOG 0, 0, 299, 103
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sampling Condition"
-FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN"
-BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,242,74,50,14
-    LTEXT           "Input method",IDC_STATIC,12,22,39,8
-    GROUPBOX        "A/D boards",IDC_STATIC,7,2,173,86
-    EDITTEXT        IDC_EDIT_ADMethod0,58,19,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_ADMethod1,118,19,54,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "1st.",IDC_STATIC,78,10,11,8
-    LTEXT           "2nd.",IDC_STATIC,140,10,12,8
-    LTEXT           "Resolution",IDC_STATIC,12,37,32,8
-    EDITTEXT        IDC_EDIT_ADResolution0,58,36,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_ADResolution1,118,36,54,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "Range",IDC_STATIC,12,53,19,8
-    EDITTEXT        IDC_EDIT_ADRange0,58,52,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_ADRange1,118,52,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_ADMaxChannel0,58,68,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_ADMaxChannel1,118,68,54,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "Max. Channel",IDC_STATIC,12,72,40,8
-    GROUPBOX        "D/A boards",IDC_STATIC,184,2,108,71
-    LTEXT           "Resolution",IDC_STATIC,187,22,32,8
-    EDITTEXT        IDC_EDIT_DAResolution0,231,19,54,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "Range",IDC_STATIC,187,39,19,8
-    EDITTEXT        IDC_EDIT_DARange0,231,36,54,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_DAMaxChannel0,231,52,54,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "Max. Channel",IDC_STATIC,187,54,40,8
-    LTEXT           "1st.",IDC_STATIC,249,10,11,8
-END
-
-IDD_Calibration_Factor DIALOG 0, 0, 362, 315
+IDD_Calibration_Factor DIALOGEX 0, 0, 362, 315
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Get Calibration Factors."
-FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN"
+FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,307,294,50,14
     LTEXT           "Statics",IDC_STATIC_C01,8,71,64,8
@@ -524,7 +487,7 @@ BEGIN
     PUSHBUTTON      "Amp.",IDC_BUTTON_Amp00,273,52,29,14
     EDITTEXT        IDC_EDIT_CFP00,198,52,40,14,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_EDIT_Channels,12,17,51,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Change",IDC_BUTTON_ChannelChange,67,17,50,14
+    PUSHBUTTON      "Change",IDC_BUTTON_ChannelChange,67,17,50,14,WS_DISABLED
     GROUPBOX        "Displayed Channels",IDC_STATIC,4,7,276,28
 END
 
@@ -995,41 +958,6 @@ BEGIN
     LTEXT           "7: Creep without the control in extension direction ( Motor_rpm, q, time ),",IDC_STATIC,14,272,212,8
 END
 
-IDD_SamplingSettings DIALOG 0, 0, 227, 261
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sampling Conditions with FIFO"
-FONT 9, "ÇlÇr ÇoÉSÉVÉbÉN"
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,109,240,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,170,240,50,14
-    LTEXT           "Memory Type",IDC_STATIC,15,96,40,8
-    LTEXT           "Channels",IDC_STATIC,15,114,28,8
-    LTEXT           "Allocated Memory (MB)",IDC_STATIC,15,184,70,8
-    LTEXT           "Sampling Clock (ms)",IDC_STATIC,15,202,62,8
-    LTEXT           "Saving Time (s)",IDC_STATIC,15,219,47,8
-    LTEXT           "EventSamplingTimes (n)",IDC_STATIC,15,132,72,8
-    EDITTEXT        IDC_EDIT_MemoryType,118,92,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_EDIT_Channels,118,110,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_EDIT_AllocatedMemory,118,182,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_EDIT_SamplingClock,118,200,40,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_SavingTime,118,217,40,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_EventSamplingTimes,118,128,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "( 1 -100 )",IDC_STATIC,165,203,30,8
-    LTEXT           "TotalSamplingTimes (n)",IDC_STATIC,15,166,70,8
-    EDITTEXT        IDC_EDIT_TotalSamplingTimes,118,164,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Check",IDC_BUTTON_Check,166,95,50,14
-    LTEXT           "Time Interval (ms) to display",IDC_STATIC,14,24,86,8
-    LTEXT           "Time Interval (ms) to feed back",IDC_STATIC,14,41,94,8
-    LTEXT           "Time Interval (ms) to save data",IDC_STATIC,14,57,94,8
-    EDITTEXT        IDC_EDIT_TimeInterval1,118,22,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_EDIT_TimeInterval2,118,39,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_EDIT_TimeInterval3,118,56,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    GROUPBOX        "Sampling Settings of Timers",IDC_STATIC,7,7,213,66
-    GROUPBOX        "Sampling Conditions with FIFO Memory",IDC_STATIC,7,79,213,157
-    LTEXT           "Number of data to average (n)",IDC_STATIC,15,149,90,8
-    EDITTEXT        IDC_EDIT_AvSmplNum,118,146,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-END
-
 IDD_Control_PreConsolidation DIALOG 0, 0, 155, 71
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control in Pre-Consolidation"
@@ -1156,14 +1084,6 @@ BEGIN
         HORZGUIDE, 58
     END
 
-    IDD_BoardSettings, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 292
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 89
-    END
-
     IDD_Calibration_Factor, DIALOG
     BEGIN
         LEFTMARGIN, 4
@@ -1260,14 +1180,6 @@ BEGIN
         BOTTOMMARGIN, 286
     END
 
-    IDD_SamplingSettings, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 220
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 254
-    END
-
     IDD_Control_PreConsolidation, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -1293,6 +1205,22 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIGITSHOWBASIC_FORM AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_Calibration_Factor AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -20,11 +20,16 @@
 #include    "stdafx.h"
 #include    "DigitShowBasic.h"
 #include    "DigitShowBasicDoc.h"
-#include    "caio.h"
-#include    "dataconvert.h"
+#include    "ModbusRTU.h"
 
 #include    "time.h"
 #include    "math.h"
+
+// NOTE: The following areas may need manual adjustment after migration:
+// 1. The COM port for Modbus needs to be configured (currently hardcoded as "COM3")
+// 2. The Modbus slave address needs to be configured (currently set to 1)
+// 3. The timer-based AD acquisition is handled in DigitShowBasicView::OnTimer()
+// 4. DA output is now triggered only when values change, after AI read
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -102,104 +107,35 @@ void CDigitShowBasicDoc::Dump(CDumpContext& dc) const
 void CDigitShowBasicDoc::OpenBoard()
 {
     DigitShowContext* ctx = GetContext();
-    int    i;
     
     if(ctx->FlagSetBoard){
         AfxMessageBox("Initialization has been already accomplished", MB_ICONSTOP | MB_OK );
         return;
     }
     else{
-        // OPEN A/D BOARDS.
-        if(ctx->NumAD > 0 ){
-            ctx->Ret = AioInit ( "AIO000" , &ctx->ad.Id[0] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->ad.Id[0]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
+        // Open Modbus RTU connection
+        // COM port is specified here - no configuration dialog needed
+        ModbusRTU* modbus = GetModbusInstance();
+        
+        if(!modbus->Open("COM3", 1)){
+            ctx->TextString.Format("Modbus Open failed: %s", modbus->GetLastError());
+            AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK);
+            return;
         }
-        if(ctx->NumAD > 1){
-            ctx->Ret = AioInit ( "AIO001" , &ctx->ad.Id[1] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->ad.Id[1]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
-        }
-        // OPEN D/A BOARDS.
-        if(ctx->NumDA > 0){
-            ctx->Ret = AioInit("AIO003" , &ctx->da.Id[0] );
-            if(ctx->Ret != 0){
-                ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                 ctx->TextString.Format("AioInit = %d : %s", ctx->Ret, ctx->ErrorString);
-                AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                return;
-            }
-            else{
-                ctx->Ret = AioResetDevice(ctx->da.Id[0]);
-                if(ctx->Ret != 0){
-                    ctx->Ret2 = AioGetErrorString(ctx->Ret, ctx->ErrorString);
-                     ctx->TextString.Format("AioResetDevice = %d : %s", ctx->Ret, ctx->ErrorString);
-                    AfxMessageBox( ctx->TextString, MB_ICONSTOP | MB_OK );
-                    return;
-                }
-            }
-        }
-        // Set Sampling Condition
-        for(i = 0;i<ctx->NumAD;i++){
-            ctx->Ret = AioGetAiInputMethod ( ctx->ad.Id[i] , &ctx->ad.InputMethod[i] );
-            ctx->Ret = AioGetAiResolution ( ctx->ad.Id[i] , &ctx->ad.Resolution[i] );
-            ctx->Ret = AioGetAiMaxChannels ( ctx->ad.Id[i] , &ctx->ad.Channels[i] );
-            ctx->Ret = AioSetAiChannels ( ctx->ad.Id[i] , ctx->ad.Channels[i] );
-            ctx->AdMaxChannels = ctx->AdMaxChannels+ctx->ad.Channels[i]/2;
-            ctx->Ret = AioSetAiRangeAll ( ctx->ad.Id[i], 1 );
-            // (-5V, 5V)
-            ctx->Ret = AioGetAiRange ( ctx->ad.Id[i] , 0 , &ctx->ad.Range[i] );
-            ctx->Ret = GetRangeValue(ctx->ad.Range[i], &ctx->ad.RangeMax[i], &ctx->ad.RangeMin[i]);
-            ctx->Ret = AioGetAiMemoryType ( ctx->ad.Id[i] , &ctx->ad.MemoryType[i] );
-            ctx->Ret = AioGetAiSamplingClock ( ctx->ad.Id[i] , &ctx->ad.SamplingClock[i] );
-            //2020.02.13 M.Kuno ScanClock制御を追加
-            {
-                short maxChannels = 64;
-                ctx->Ret = AioGetAiMaxChannels(ctx->ad.Id[i], &maxChannels);
-                float scanClock = 1000.f / maxChannels;
-                ctx->Ret = AioSetAiScanClock(ctx->ad.Id[i], scanClock);
-                ctx->Ret = AioGetAiScanClock(ctx->ad.Id[i], &ctx->ad.ScanClock[i]);
-            }
-            ctx->Ret = AioGetAiEventSamplingTimes ( ctx->ad.Id[i] , &ctx->ad.SamplingTimes[i] );
-        }
+        
+        // Sampling settings (simplified for Modbus - no buffering/averaging needed)
         ctx->sampling.SavingTime = 300;
-        ctx->sampling.TotalSamplingTimes = long(ctx->sampling.SavingTime*1000000/ctx->ad.SamplingClock[0]);
-        ctx->sampling.AllocatedMemory = 4*ctx->AdMaxChannels* ctx->sampling.TotalSamplingTimes/1024.0f/1024.0f;
-        ctx->sampling.AvSmplNum = 20;
-        for(i = 0;i<ctx->NumDA;i++){
-            ctx->Ret = AioGetAoResolution ( ctx->da.Id[i] , &ctx->da.Resolution[i] );
-            ctx->Ret = AioGetAoMaxChannels ( ctx->da.Id[i] , &ctx->da.Channels[i] );
-            ctx->Ret = AioSetAoRangeAll ( ctx->da.Id[i] , 50 );
-            // 0 - 10V
-            ctx->Ret = AioGetAoRange ( ctx->da.Id[i] , 0 , &ctx->da.Range[i] );
-            ctx->Ret = GetRangeValue(ctx->da.Range[i], &ctx->da.RangeMax[i], &ctx->da.RangeMin[i]);
+        ctx->sampling.TotalSamplingTimes = ctx->sampling.SavingTime * 10;  // 10 samples/sec at 100ms interval
+        
+        // Output 0V to all AO channels on startup
+        uint16_t zeroOutput[ModbusRTU::AO_CHANNELS] = {0};
+        modbus->WriteHoldingRegisters(zeroOutput);
+        
+        // Initialize DAVout to 0
+        for(int i = 0; i < ModbusRTU::AO_CHANNELS; i++){
+            ctx->DAVout[i] = 0.0f;
         }
+        
         ctx->FlagSetBoard = TRUE;
     }
     return;
@@ -208,55 +144,78 @@ void CDigitShowBasicDoc::OpenBoard()
 void CDigitShowBasicDoc::CloseBoard()
 {
     DigitShowContext* ctx = GetContext();
-    // Close A/D and D/A board to end the application 
+    // Close Modbus connection
     if( ctx->FlagSetBoard==TRUE ){
-        if(ctx->NumAD > 0)    ctx->Ret = AioExit(ctx->ad.Id[0]);
-        if(ctx->NumAD > 1)    ctx->Ret = AioExit(ctx->ad.Id[1]);
-        if(ctx->NumDA > 0)    ctx->Ret = AioExit(ctx->da.Id[0]);
+        ModbusRTU* modbus = GetModbusInstance();
+        
+        // Output 0V to all AO channels before closing
+        uint16_t zeroOutput[ModbusRTU::AO_CHANNELS] = {0};
+        modbus->WriteHoldingRegisters(zeroOutput);
+        
+        modbus->Close();
+        ctx->FlagSetBoard = FALSE;
     }
 }
 
 //--- Input from A/D Board ---
+// This function is called by the timer every 100ms (Timer ID 1 in DigitShowBasicView)
+// Reads 16 channels of int16_t data via Modbus RTU ReadInputRegisters
+// HX711 (ch 0-7): int16_t values
+// ADS1115 (ch 8-15): int16_t values
+// No averaging is performed (Modbus assumed to be noise-free)
 void CDigitShowBasicDoc::AD_INPUT()
 {
     DigitShowContext* ctx = GetContext();
-    int    i,j,k;
-    k = 0;
-    if(ctx->NumAD>0){
-        for(i = 0;i<ctx->ad.Channels[0]/2;i++){
-            ctx->Vout[k] = 0.0f;
-            for(j = 0;j<ctx->sampling.AvSmplNum;j++){
-                ctx->Vout[k] = ctx->Vout[k]+BinaryToVolt(ctx->ad.RangeMax[0], ctx->ad.RangeMin[0], ctx->ad.Resolution[0], ctx->ad.Data0[ctx->ad.Channels[0]*j+2*i])/float(ctx->sampling.AvSmplNum);
-            }
-            k = k+1;
-        }
+    ModbusRTU* modbus = GetModbusInstance();
+    
+    if(!modbus->IsOpen()){
+        return;
     }
-    if(ctx->NumAD>1){
-        for(i = 0;i<ctx->ad.Channels[1]/2;i++){
-            ctx->Vout[k] = 0.0f;
-            for(j = 0;j<ctx->sampling.AvSmplNum;j++){
-                ctx->Vout[k] = ctx->Vout[k]+BinaryToVolt(ctx->ad.RangeMax[1], ctx->ad.RangeMin[1], ctx->ad.Resolution[1], ctx->ad.Data1[ctx->ad.Channels[1]*j+2*i])/float(ctx->sampling.AvSmplNum);
-            }
-            k = k+1;
-        }
+    
+    // Read all 16 AI channels via Modbus
+    int16_t aiData[ModbusRTU::AI_CHANNELS];
+    if(!modbus->ReadInputRegisters(aiData)){
+        // Read failed - could log error here
+        // ctx->TextString.Format("Modbus read error: %s", modbus->GetLastError());
+        return;
+    }
+    
+    // Convert int16_t values to float for Vout
+    // NOTE: The calibration factors (ctx->cal) will convert these to physical values
+    // in Cal_Physical(). The raw int16_t values are stored as-is.
+    for(int i = 0; i < ModbusRTU::AI_CHANNELS; i++){
+        ctx->Vout[i] = static_cast<float>(aiData[i]);
     }
 }
 
 //--- Output to D/A Board ---
+// This function outputs to 8 channels via Modbus RTU WriteHoldingRegisters
+// GP8403 (ch 0-7): 0-10000 mV output, clamped to range
+// Only writes when values have changed (change detection is in ModbusRTU class)
 void CDigitShowBasicDoc::DA_OUTPUT()
 {
     DigitShowContext* ctx = GetContext();
-    int    i,j,k;
-    k = 0;
-    for(i = 0;i<ctx->NumDA;i++){
-        for(j = 0;j<ctx->da.Channels[i];j++){
-            if(ctx->DAVout[k]<0.0f)    ctx->DAVout[k] = 0.0f;
-            if(ctx->DAVout[k]>9.9999f) ctx->DAVout[k] = 9.9999f;
-            ctx->da.Data[j] = VoltToBinary(ctx->da.RangeMax[i], ctx->da.RangeMin[i], ctx->da.Resolution[i], ctx->DAVout[k]);
-            k = k+1;
-        }
-        ctx->Ret = AioMultiAo(ctx->da.Id[i], ctx->da.Channels[i], &ctx->da.Data[0]);
+    ModbusRTU* modbus = GetModbusInstance();
+    
+    if(!modbus->IsOpen()){
+        return;
     }
+    
+    // Convert DAVout (voltage) to mV for GP8403
+    // DAVout is in Volts (0-10V range), GP8403 expects 0-10000 mV
+    uint16_t aoData[ModbusRTU::AO_CHANNELS];
+    for(int i = 0; i < ModbusRTU::AO_CHANNELS; i++){
+        // Clamp voltage to 0-10V range
+        float voltage = ctx->DAVout[i];
+        if(voltage < 0.0f) voltage = 0.0f;
+        if(voltage > 10.0f) voltage = 10.0f;
+        
+        // Convert to mV (0-10000)
+        aoData[i] = static_cast<uint16_t>(voltage * 1000.0f);
+    }
+    
+    // Write to Modbus (only if values changed)
+    modbus->WriteHoldingRegisters(aoData);
 }
 
 //--- Calcuration of Physical Value ---
@@ -264,7 +223,7 @@ void CDigitShowBasicDoc::Cal_Physical()
 {
     DigitShowContext* ctx = GetContext();
     int    i;
-    for(i = 0;i<64;i++){
+    for(i = 0;i< ModbusRTU::AI_CHANNELS;i++){
         ctx->Phyout[i] =    ctx->cal.a[i]* ctx->Vout[i]* ctx->Vout[i] + ctx->cal.b[i]* ctx->Vout[i] + ctx->cal.c[i];
     }
 }
@@ -346,12 +305,10 @@ void CDigitShowBasicDoc::SaveToFile()
     k = 0;
     fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->SequentTime2);
     fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->SequentTime2);
-    for(i = 0;i<ctx->NumAD;i++){
-        for(j = 0;j<ctx->ad.Channels[i]/2;j++){
-            fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vout[k]);
-            fprintf(ctx->FileSaveData1,"%lf    ", ctx->Phyout[k]);
-            k = k+1;
-        }
+    for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
+        fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vout[k]);
+        fprintf(ctx->FileSaveData1,"%lf    ", ctx->Phyout[k]);
+        k = k+1;
     }
     fprintf(ctx->FileSaveData0,"\n");
     fprintf(ctx->FileSaveData1,"\n");
@@ -371,45 +328,15 @@ void CDigitShowBasicDoc::SaveToFile2()
         k = 0;
         fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
         fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
-        if(ctx->NumAD>0){
-            for(j = 0;j<ctx->ad.Channels[0]/2;j++){
-                ctx->Vtmp = BinaryToVolt(ctx->ad.RangeMax[0], ctx->ad.RangeMin[0], ctx->ad.Resolution[0], *((PLONG)ctx->pSmplData0+i*ctx->ad.Channels[0]/2+j));
-                ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
-                k = k+1;
-                fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
-                fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
-            }
-        }
-        if(ctx->NumAD>1){
-            for(j = 0;j<ctx->ad.Channels[1]/2;j++){
-                ctx->Vtmp = BinaryToVolt(ctx->ad.RangeMax[1], ctx->ad.RangeMin[1], ctx->ad.Resolution[1], *((PLONG)ctx->pSmplData1+i*ctx->ad.Channels[1]/2+j));
-                ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
-                k = k+1;
-                fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
-                fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
-            }
+        for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
+            ctx->Vtmp = ctx->ai_raw[j];
+            ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
+            k = k+1;
+            fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
+            fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
         }
         fprintf(ctx->FileSaveData0,"\n");
         fprintf(ctx->FileSaveData1,"\n");
-    }
-}
-
-void CDigitShowBasicDoc::Allocate_Memory()
-{
-    DigitShowContext* ctx = GetContext();
-    if(ctx->FlagSaveData==TRUE){
-        if(ctx->NumAD>0){
-            ctx->hHeap0 = GetProcessHeap();
-            ctx->pSmplData0 = HeapAlloc(ctx->hHeap0,HEAP_ZERO_MEMORY,unsigned long(ctx->sampling.TotalSamplingTimes*ctx->ad.Channels[0]/2*sizeof(LONG)));
-        }
-        if(ctx->NumAD>1){
-            ctx->hHeap1 = GetProcessHeap();
-            ctx->pSmplData1 = HeapAlloc(ctx->hHeap1,HEAP_ZERO_MEMORY,unsigned long(ctx->sampling.TotalSamplingTimes*ctx->ad.Channels[1]/2*sizeof(LONG)));
-        }
-    }
-    if(ctx->FlagSaveData==FALSE){
-        if(ctx->NumAD>0)    HeapFree(ctx->hHeap0,0,ctx->pSmplData0);
-        if(ctx->NumAD>1)    HeapFree(ctx->hHeap1,0,ctx->pSmplData1);
     }
 }
 
@@ -456,7 +383,7 @@ void CDigitShowBasicDoc::Control_DA()
                     ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
                     // RPM->0
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 2:
@@ -487,7 +414,7 @@ void CDigitShowBasicDoc::Control_DA()
                 ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
                 // RPM->0
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 3:
@@ -526,7 +453,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM->0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 4:
@@ -565,7 +492,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM->0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 5:
@@ -632,7 +559,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // Cruch:Up
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 6:
@@ -698,7 +625,7 @@ void CDigitShowBasicDoc::Control_DA()
                     // Cruch:Up
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 7:
@@ -753,42 +680,42 @@ void CDigitShowBasicDoc::Control_DA()
                     // RPM -> 0
                 }
             }
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 8:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 9:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 10:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 11:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 12:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 13:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 14:
         { 
-            DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
         }
         break;
     case 15:
@@ -804,7 +731,7 @@ void CDigitShowBasicDoc::Control_DA()
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==5 )    Creep();
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==6 )    LinearEffectiveStressPath();
                 if( ctx->controlFile.Num[ctx->controlFile.CurrentNum]==7 )    Creep2();
-                DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
             }
         }
         break;
@@ -820,7 +747,7 @@ void CDigitShowBasicDoc::Stop_Control()
     DigitShowContext* ctx = GetContext();
     ctx->DAVout[ctx->daChannel.MotorSpeed] = 0.0f;
     //Motor Speed->0
-    DA_OUTPUT();
+            // Note: DAVout values are written by Timer 1 DA_OUTPUT()
 }
 
 void CDigitShowBasicDoc::MLoading_Stress()
