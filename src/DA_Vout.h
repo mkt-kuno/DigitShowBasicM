@@ -39,14 +39,6 @@ public:
     float m_DAVout06;
     float m_DAVout07;
     float m_DAVout08;
-    float m_DAVout09;
-    float m_DAVout10;
-    float m_DAVout11;
-    float m_DAVout12;
-    float m_DAVout13;
-    float m_DAVout14;
-    float m_DAVout15;
-    float m_DAVout16;
 
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);
