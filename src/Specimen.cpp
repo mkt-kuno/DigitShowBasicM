@@ -281,11 +281,11 @@ void CSpecimen::OnBUTTONBeConsol()
     SpecimenData->Diameter[2] = SpecimenData->Diameter[1]*sqrt(SpecimenData->Area[2]/SpecimenData->Area[1]) ;
     SpecimenData->Depth[2]  = SpecimenData->Depth[1]*sqrt(SpecimenData->Area[2]/SpecimenData->Area[1]);
     SpecimenData->Width[2]  = SpecimenData->Width[1]*sqrt(SpecimenData->Area[2]/SpecimenData->Area[1]);
-    SpecimenData->VLDT1[2] = ctx->Phyout[5];
-    SpecimenData->VLDT2[2] = ctx->Phyout[6];
+    SpecimenData->VLDT1[2] = ctx->Phyout[6];
+    SpecimenData->VLDT2[2] = ctx->Phyout[7];
     ctx->cal.c[1] = ctx->cal.c[1]- ctx->Phyout[1];
     //---0-adjustment of Displacement transducer---
-    ctx->cal.c[4] = ctx->cal.c[4]- ctx->Phyout[4];
+    ctx->cal.c[9] = ctx->cal.c[9]- ctx->Phyout[9];
     //---0-adjustment of Volume Change ---
     Reflesh();
     OnBUTTONToPresent2();
@@ -297,16 +297,16 @@ void CSpecimen::OnBUTTONAfConsolidation()
     auto SpecimenData = &ctx->specimen;
 
     SpecimenData->Height[3] = SpecimenData->Height[2]-ctx->Phyout[1];    
-    SpecimenData->Volume[3] = SpecimenData->Volume[2]-ctx->Phyout[4];
+    SpecimenData->Volume[3] = SpecimenData->Volume[2]-ctx->Phyout[9];
     SpecimenData->Area[3]   = SpecimenData->Volume[3]/SpecimenData->Height[3];
     SpecimenData->Diameter[3] = SpecimenData->Diameter[2]*sqrt(SpecimenData->Area[3]/SpecimenData->Area[2]);
     SpecimenData->Depth[3] = SpecimenData->Depth[2]*sqrt(SpecimenData->Area[3]/SpecimenData->Area[2]);
     SpecimenData->Width[3] = SpecimenData->Width[2]*sqrt(SpecimenData->Area[3]/SpecimenData->Area[2]);    
-    SpecimenData->VLDT1[3] = ctx->Phyout[5];
-    SpecimenData->VLDT2[3] = ctx->Phyout[6];
+    SpecimenData->VLDT1[3] = ctx->Phyout[6];
+    SpecimenData->VLDT2[3] = ctx->Phyout[7];
     ctx->cal.c[1] = ctx->cal.c[1]- ctx->Phyout[1];
     //---0-adjustment of Displacement transducer---
-    ctx->cal.c[4] = ctx->cal.c[4]- ctx->Phyout[4];
+    ctx->cal.c[9] = ctx->cal.c[9]- ctx->Phyout[9];
     //---0-adjustment of Volume Change ---
     Reflesh();
     OnBUTTONToPresent3();
