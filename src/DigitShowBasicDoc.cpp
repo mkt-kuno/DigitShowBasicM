@@ -357,8 +357,8 @@ void CDigitShowBasicDoc::Control_DA()
         //---Before Consolidation: Keep the specimen isotropic condition by Motor Control.--- 
         // ControlData[1].q: Reference Error Stress (kPa).
         // ControlData[1].MotorSpeed: The Maximum Motor Speed (rpm).
-            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             // Motor: On
+            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             if(ctx->phys.q > ctx->errTol.StressCom ){
                 ctx->DAVout[ctx->daChannel.MotorCruch] = 5.0f;
                 // Cruch: Up
@@ -393,8 +393,8 @@ void CDigitShowBasicDoc::Control_DA()
         // ControlData[2].K0:            K0 value,
         // ControlData[2].sigmaRate[2]:    Increase Rate of Cell Pressure 
         // ControlData[2].MotorSpeed:    Motor Speed
-            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             // Motor: On
+            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ControlData[2].MotorSpeed+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
             if( ctx->phys.e_sr < ControlData[2].e_sigma[0]*ControlData[2].K0-ctx->errTol.StressA){
                 ctx->DAVout[ctx->daChannel.EP_Cell] = ctx->DAVout[ctx->daChannel.EP_Cell]+float(ctx->cal.DA_a[ctx->daChannel.EP_Cell]*ControlData[2].sigmaRate[2]/60.0*ctx->timeSettings.Interval2/1000.0);
@@ -424,8 +424,8 @@ void CDigitShowBasicDoc::Control_DA()
         // ControlData[3].MotorCruch:    Compression:1 /Extension:0                        
         // ControlData[3].flag[0]:        Monotonic_Loading:0 /Creep:1
         // ControlData[3].sigma[0];        Limiter
-            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             // Motor: On
+            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ControlData[3].MotorSpeed+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
             if(ControlData[3].flag[0]==FALSE){        // Monotonic Loading
                 if(ControlData[3].MotorCruch == 0 ){
@@ -464,8 +464,8 @@ void CDigitShowBasicDoc::Control_DA()
         // ControlData[4].flag:            Loading:0 /Creep:1
         // ControlData[4].sigma[0];        Limiter
             ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ControlData[4].MotorSpeed+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
-            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             // Motor:On
+            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             if(ControlData[4].flag[0]==FALSE){        // Monotonic Loading
                 if(ControlData[4].MotorCruch == 0 ){
                     ctx->DAVout[ctx->daChannel.MotorCruch] = 0.0f;
@@ -499,8 +499,8 @@ void CDigitShowBasicDoc::Control_DA()
         { 
             // Cyclic Loading
             ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ControlData[5].MotorSpeed+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
-            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             // Motor:On
+            ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
             if(ControlData[5].flag[0]==FALSE){            // Cyclic in compression test
                 if(ControlData[5].time[0]<ControlData[5].time[1]){ 
                     ctx->DAVout[ctx->daChannel.MotorCruch] = 0.0f;
@@ -754,8 +754,8 @@ void CDigitShowBasicDoc::MLoading_Stress()
 {
     DigitShowContext* ctx = GetContext();
     ctx->TotalStepTime = ctx->TotalStepTime+ctx->CtrlStepTime/60.0;
-    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     // Motor: On
+    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ctx->controlFile.Para[ctx->controlFile.CurrentNum][1]+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
     // Motor_Speed
     if(ctx->controlFile.Para[ctx->controlFile.CurrentNum][0]==0.0){
@@ -784,8 +784,8 @@ void CDigitShowBasicDoc::MLoading_Strain()
 {
     DigitShowContext* ctx = GetContext();
     ctx->TotalStepTime = ctx->TotalStepTime+ctx->CtrlStepTime/60.0;
-    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     // Motor: On
+    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ctx->controlFile.Para[ctx->controlFile.CurrentNum][1]+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
     // Motor_Speed
     if(ctx->controlFile.Para[ctx->controlFile.CurrentNum][0]==0.0){
@@ -814,8 +814,8 @@ void CDigitShowBasicDoc::CLoading_Stress()
 {
     DigitShowContext* ctx = GetContext();
     ctx->TotalStepTime = ctx->TotalStepTime+ctx->CtrlStepTime/60.0;
-    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     // Motor: On
+    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ctx->controlFile.Para[ctx->controlFile.CurrentNum][1]+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
     // Motor_Speed
     if(ctx->controlFile.Para[ctx->controlFile.CurrentNum][0]==0.0){
@@ -937,8 +937,8 @@ void CDigitShowBasicDoc::Creep()
 {
     DigitShowContext* ctx = GetContext();
     ctx->TotalStepTime = ctx->TotalStepTime+ctx->CtrlStepTime/60.0;
-    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     // Motor:On
+    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ctx->controlFile.Para[ctx->controlFile.CurrentNum][0]+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
     if( ctx->phys.q>=ctx->controlFile.Para[ctx->controlFile.CurrentNum][1]+ctx->errTol.StressCom)    {
         ctx->DAVout[ctx->daChannel.MotorCruch] = 5.0f;
@@ -1033,8 +1033,8 @@ void CDigitShowBasicDoc::Creep2()
 {
     DigitShowContext* ctx = GetContext();
     ctx->TotalStepTime = ctx->TotalStepTime+ctx->CtrlStepTime/60.0;
-    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     // Motor:On
+    ctx->DAVout[ctx->daChannel.Motor] = 5.0f;
     ctx->DAVout[ctx->daChannel.MotorSpeed] = float(ctx->cal.DA_a[ctx->daChannel.MotorSpeed]*ctx->controlFile.Para[ctx->controlFile.CurrentNum][0]+ctx->cal.DA_b[ctx->daChannel.MotorSpeed]);
     if( ctx->phys.q <= ctx->controlFile.Para[ctx->controlFile.CurrentNum][1]+ctx->errTol.StressExt)    {
         ctx->DAVout[ctx->daChannel.MotorCruch] = 0.0f;
