@@ -140,8 +140,8 @@ struct TimeSettings {
  * D/A Channel assignments
  */
 struct DaChannelAssign {
-    int Motor;
-    int MotorCruch;
+    int MotorOnOff;
+    int MotorUpDown;
     int MotorSpeed;
     int EP_Cell;
 };
