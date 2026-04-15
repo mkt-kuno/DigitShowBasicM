@@ -234,49 +234,35 @@ void CDigitShowBasicDoc::Cal_Param()
     DigitShowContext* ctx = GetContext();
     auto SpecimenData = &ctx->specimen;
     //    Specimen Data in drain and undrain condition
-    ctx->height = SpecimenData->Height[0]-ctx->Phyout[1];
-    // Current height
-    ctx->volume = SpecimenData->Volume[0]- ctx->Phyout[9];
-    // Current volume in drain condition
-    ctx->area = ctx->volume/ ctx->height;
-    // Current area
-    ctx->phys.ea = -log(ctx->height/SpecimenData->Height[0])*100.0;
-    // True Axial Strain (%)
-    ctx->phys.ev = -log(ctx->volume/SpecimenData->Volume[0])*100.0;
-    // True Volumetric Strain in drain condition (%)
-    ctx->phys.er = (ctx->phys.ev- ctx->phys.ea)/2.0;
-    // True Radial strain (%)
+    ctx->height = SpecimenData->Height[0]-ctx->Phyout[1];               // Current height
+    ctx->volume = SpecimenData->Volume[0]- ctx->Phyout[9];              // Current volume in drain condition
+    ctx->area = ctx->volume/ ctx->height;                               // Current area
+    ctx->phys.ea = -log(ctx->height/SpecimenData->Height[0])*100.0;     // True Axial Strain (%)
+    ctx->phys.ev = -log(ctx->volume/SpecimenData->Volume[0])*100.0;     // True Volumetric Strain in drain condition (%)
+    ctx->phys.er = (ctx->phys.ev- ctx->phys.ea)/2.0;                    // True Radial strain (%)
     if(SpecimenData->VLDT1[0]>0.0 && ctx->Phyout[6]>0.0) {
-        ctx->phys.eLDT1 = -log(ctx->Phyout[6]/SpecimenData->VLDT1[0])*100.0;
         // True LDT Strain (%)
+        ctx->phys.eLDT1 = -log(ctx->Phyout[6]/SpecimenData->VLDT1[0])*100.0;
     }
     else{
         ctx->phys.eLDT1 = 0.0;
     }
     if(SpecimenData->VLDT2[0]>0.0 && ctx->Phyout[7]>0.0) {
-        ctx->phys.eLDT2 = -log(ctx->Phyout[7]/SpecimenData->VLDT2[0])*100.0;
         // True LDT Strain (%)
+        ctx->phys.eLDT2 = -log(ctx->Phyout[7]/SpecimenData->VLDT2[0])*100.0;
     }
     else{
         ctx->phys.eLDT2 = 0.0;
     }
     ctx->phys.eLDT = (ctx->phys.eLDT1+ ctx->phys.eLDT2)/2.0;
-    ctx->phys.q = ctx->Phyout[0]/ctx->area*1000.0;
-    // Deviator Stress (kPa)
-    ctx->phys.sr = ctx->Phyout[2];
-    // Cell(Radial) Stress (kPa)
-    ctx->phys.sa = ctx->phys.q+ ctx->phys.sr;
-    // Axial Stress (kPa)
-    ctx->phys.p = (ctx->phys.sa+2.0* ctx->phys.sr)/3.0;
-    // Mean Principal Stress (kPa)
-    ctx->phys.e_sr = ctx->Phyout[8];
-    // Cell Effective Stress (kPa)
-    ctx->phys.e_sa = ctx->phys.q+ ctx->phys.e_sr;
-    // Axial Effective Stress (kPa)
-    ctx->phys.u = ctx->phys.sr- ctx->phys.e_sr;
-    // Pore Pressure
-    ctx->phys.e_p = (ctx->phys.e_sa+2.0* ctx->phys.e_sr)/3.0;
-    // Mean Effective Stress (kPa)
+    ctx->phys.q = ctx->Phyout[0]/ctx->area*1000.0;              // Deviator Stress (kPa)
+    ctx->phys.sr = ctx->Phyout[2];                              // Cell(Radial) Stress (kPa)
+    ctx->phys.sa = ctx->phys.q+ ctx->phys.sr;                   // Axial Stress (kPa)
+    ctx->phys.p = (ctx->phys.sa+2.0* ctx->phys.sr)/3.0;         // Mean Principal Stress (kPa)
+    ctx->phys.e_sr = ctx->Phyout[8];                            // Cell Effective Stress (kPa)
+    ctx->phys.e_sa = ctx->phys.q+ ctx->phys.e_sr;               // Axial Effective Stress (kPa)
+    ctx->phys.u = ctx->phys.sr- ctx->phys.e_sr;                 // Pore Pressure
+    ctx->phys.e_p = (ctx->phys.e_sa+2.0* ctx->phys.e_sr)/3.0;   // Mean Effective Stress (kPa)
     //---The Value to display---
     ctx->CalParam[0] = ctx->phys.sa;
     ctx->CalParam[1] = ctx->phys.sr;
