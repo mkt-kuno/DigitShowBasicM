@@ -497,13 +497,13 @@ void CDigitShowBasicView::OnBUTTONStartSave()
             fprintf(ctx->FileSaveData1,"%s    ","Load_(N)");
             fprintf(ctx->FileSaveData1,"%s    ","Disp.(mm)");
             fprintf(ctx->FileSaveData1,"%s    ","Cell_P.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","ECellP.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(mm3)");
+            fprintf(ctx->FileSaveData1,"%s    ","CH03");
+            fprintf(ctx->FileSaveData1,"%s    ","CH04");
+            fprintf(ctx->FileSaveData1,"%s    ","CH05");
             fprintf(ctx->FileSaveData1,"%s    ","V-LDT1_(mm)");
             fprintf(ctx->FileSaveData1,"%s    ","V-LDT2_(mm)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH07_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH08_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH09_(V)");
+            fprintf(ctx->FileSaveData1,"%s    ","ECellP.(kPa)");
+            fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(mm3)");
             fprintf(ctx->FileSaveData1,"%s    ","CH10_(V)");
             fprintf(ctx->FileSaveData1,"%s    ","CH11_(V)");
             fprintf(ctx->FileSaveData1,"%s    ","CH12_(V)");
