@@ -25,8 +25,11 @@
 #include    "time.h"
 #include    "math.h"
 
+#include    <setupapi.h>
+#pragma comment(lib, "setupapi.lib")
+
 // NOTE: The following areas may need manual adjustment after migration:
-// 1. The COM port for Modbus needs to be configured (currently hardcoded as "COM3")
+// 1. The COM port for Modbus is now auto-detected (USB COM ports only)
 // 2. The Modbus slave address needs to be configured (currently set to 1)
 // 3. The timer-based AD acquisition is handled in DigitShowBasicView::OnTimer()
 // 4. DA output is now triggered only when values change, after AI read
@@ -103,6 +106,148 @@ void CDigitShowBasicDoc::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
+// USB COMポート自動検出ヘルパー
+//
+// SetupAPI でシステムに存在するシリアルポートクラスのデバイスを列挙し、
+// ハードウェアID が "USB\" で始まる USB-COMポートだけを対象に
+// 既知の VID/PID テーブルと照合して優先度スコアを付ける。
+// 最高スコアのポートを返す。同スコアなら番号の大きいものを優先する。
+// 既知デバイスに該当しない USB-COMポートもスコア1(最低)で候補に残る。
+// ハードウェアCOMポート(ACPI/ISA等)は除外する。
+static CString DetectArduinoPort()
+{
+    // //@todo 以下のテーブルに検出したい VID/PID を追加・変更できます。
+    //         pid が NULL の場合は該当 VID のどの PID も一致とみなします。
+    static const struct {
+        const char* vid;
+        const char* pid;    // NULL = VID が一致すれば PID は問わない
+        int         priority;
+        const char* desc;
+    } knownDevices[] = {
+        // Arduino UNO R4 Minima / WiFi (Renesas RA4M1)
+        { "2341", "0069", 95, "Arduino UNO R4 Minima" },
+        { "2341", "0074", 95, "Arduino Nano R4" },
+        { "2341", "0243", 95, "Arduino Nano ESP32" },
+        // Arduino 公式 (VID 0x2341) — 上記以外のモデルも含む
+        { "2341", NULL,   90, "Arduino" },
+        // Raspberry Pi Pico / Pico W (RP2040 CDC)
+        { "2E8A", "000A", 90, "Raspberry Pi Pico (CDC)" },
+        { "2E8A", "0005", 88, "Raspberry Pi Pico (MicroPython)" },
+        { "2E8A", NULL,   86, "Raspberry Pi (RP2040)" },
+        // STM32 Virtual COM Port (CDC ACM)
+        { "0483", "5740", 85, "STM32 CDC ACM" },
+        { "0483", "374B", 82, "STM32 ST-LINK CDC" },
+        // CH340 / CH341 (Arduino clone 定番チップ)
+        { "1A86", "7523", 80, "CH340" },
+        { "1A86", "55D3", 80, "CH340C" },
+        { "1A86", "7522", 80, "CH341" },
+        { "1A86", NULL,   78, "CH340/CH341 (any)" },
+        // CP2102 / CP2104 (Silicon Labs)
+        { "10C4", "EA60", 80, "CP2102/CP2104" },
+        { "10C4", NULL,   78, "CP210x (any)" },
+    };
+    const int numKnown = static_cast<int>(sizeof(knownDevices) / sizeof(knownDevices[0]));
+
+    CString bestPort = "";
+    int     bestPriority = -1;
+    int     bestPortNum  = -1;
+
+    // シリアルポートクラス GUID: {4D36E978-E325-11CE-BFC1-08002BE10318}
+    static const GUID GUID_DEVCLASS_PORTS =
+        { 0x4D36E978, 0xE325, 0x11CE, { 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18 } };
+
+    HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVCLASS_PORTS, NULL, NULL, DIGCF_PRESENT);
+    if (hDevInfo == INVALID_HANDLE_VALUE)
+        return bestPort;
+
+    SP_DEVINFO_DATA devInfoData;
+    devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+    for (DWORD idx = 0; SetupDiEnumDeviceInfo(hDevInfo, idx, &devInfoData); idx++)
+    {
+        // ハードウェアID を取得 (複数行の MULTI_SZ 先頭エントリのみ使用)
+        char hwId[1024] = { 0 };
+        if (!SetupDiGetDeviceRegistryPropertyA(hDevInfo, &devInfoData,
+            SPDRP_HARDWAREID, NULL, reinterpret_cast<PBYTE>(hwId), sizeof(hwId) - 1, NULL))
+            continue;
+
+        // "USB\" で始まらないものはハードウェアCOMポートなのでスキップ
+        if (_strnicmp(hwId, "USB\\", 4) != 0)
+            continue;
+
+        // フレンドリ名からCOMポート番号を取得 ("USB Serial Port (COM12)" → "COM12")
+        char friendlyName[256] = { 0 };
+        if (!SetupDiGetDeviceRegistryPropertyA(hDevInfo, &devInfoData,
+            SPDRP_FRIENDLYNAME, NULL, reinterpret_cast<PBYTE>(friendlyName), sizeof(friendlyName) - 1, NULL))
+            continue;
+
+        char* comStart = strstr(friendlyName, "(COM");
+        if (!comStart) continue;
+        char portNumStr[16] = { 0 };
+        if (sscanf_s(comStart + 4, "%10[^)]", portNumStr, static_cast<unsigned int>(sizeof(portNumStr))) != 1)
+            continue;
+        int portNum = atoi(portNumStr);
+        CString portName;
+        portName.Format("COM%s", portNumStr);
+
+        // ハードウェアIDから VID / PID を解析
+        // 例: "USB\VID_1A86&PID_7523&REV_0264"
+        char* vidPtr = strstr(hwId, "VID_");
+        char* pidPtr = strstr(hwId, "PID_");
+        if (!vidPtr || !pidPtr) continue;
+        char vid[5] = { 0 }, pid[5] = { 0 };
+        strncpy_s(vid, sizeof(vid), vidPtr + 4, _TRUNCATE);
+        strncpy_s(pid, sizeof(pid), pidPtr + 4, _TRUNCATE);
+        _strupr_s(vid);
+        _strupr_s(pid);
+
+        // 既知デバイステーブルと照合して優先度を決定
+        int priority = 1;   // USB-COMだがテーブル未登録の場合の最低スコア
+        for (int k = 0; k < numKnown; k++)
+        {
+            if (_stricmp(vid, knownDevices[k].vid) == 0)
+            {
+                if (knownDevices[k].pid == NULL || _stricmp(pid, knownDevices[k].pid) == 0)
+                {
+                    priority = knownDevices[k].priority;
+                    break;
+                }
+            }
+        }
+
+        // 最高優先度を更新。同優先度ならポート番号の大きい方を採用
+        if (priority > bestPriority ||
+            (priority == bestPriority && portNum > bestPortNum))
+        {
+            bestPriority = priority;
+            bestPortNum  = portNum;
+            bestPort     = portName;
+        }
+    }
+
+    SetupDiDestroyDeviceInfoList(hDevInfo);
+
+    // Wine/Linux fallback: try ttyACM* (Arduino CDC) then ttyUSB*
+    if (bestPort.IsEmpty()) {
+        static const char* const unixPrefixes[] = { "/dev/ttyACM", "/dev/ttyUSB" };
+        for (int p = 0; p < 2 && bestPort.IsEmpty(); p++) {
+            for (int i = 0; i <= 9; i++) {
+                char path[32];
+                sprintf_s(path, sizeof(path), "%s%d", unixPrefixes[p], i);
+                HANDLE h = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+                if (h != INVALID_HANDLE_VALUE) {
+                    CloseHandle(h);
+                    bestPort = path;
+                    break;
+                }
+            }
+        }
+    }
+
+    return bestPort;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // CDigitShowBasicDoc コマンド
 void CDigitShowBasicDoc::OpenBoard()
 {
@@ -113,11 +258,28 @@ void CDigitShowBasicDoc::OpenBoard()
         return;
     }
     else{
+        //@todo COMポートを手動で指定したい場合は strPort に直接ポート名を設定してください。
+        //@todo 例: strPort = "COM3";  または strPort = "COM10"; など
+        //@todo 空文字列 ("") のままにすると、以下の自動検出処理が実行されます。
+        CString strPort = "";  // COMポート番号指定文字列 (空の場合は自動検出)
+
+        if (strPort.IsEmpty())
+        {
+            strPort = DetectArduinoPort();
+        }
+
+        if (strPort.IsEmpty())
+        {
+            AfxMessageBox("No Arduino-compatible USB COM port found.\nCheck device connection and driver.",
+                MB_ICONSTOP | MB_OK);
+            return;
+        }
+
         // Open Modbus RTU connection
         // COM port is specified here - no configuration dialog needed
         ModbusRTU* modbus = GetModbusInstance();
         
-        if(!modbus->Open("COM9", 1)){
+        if(!modbus->Open(strPort, 1)){
             ctx->TextString.Format("Modbus Open failed: %s", modbus->GetLastError());
             AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK);
             return;
@@ -303,19 +465,19 @@ void CDigitShowBasicDoc::SaveToFile()
     int    i,j,k;
 
     k = 0;
-    fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->SequentTime2);
-    fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->SequentTime2);
+    fprintf(ctx->FileSaveData0,"%.3lf\t",ctx->SequentTime2);
+    fprintf(ctx->FileSaveData1,"%.3lf\t",ctx->SequentTime2);
     for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
-        fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vout[k]);
-        fprintf(ctx->FileSaveData1,"%lf    ", ctx->Phyout[k]);
+        fprintf(ctx->FileSaveData0,"%lf\t",ctx->Vout[k]);
+        fprintf(ctx->FileSaveData1,"%lf\t", ctx->Phyout[k]);
         k = k+1;
     }
     fprintf(ctx->FileSaveData0,"\n");
     fprintf(ctx->FileSaveData1,"\n");
     // Save Parameter Data
-    fprintf(ctx->FileSaveData2,"%.3lf    ",ctx->SequentTime2);    
-    for(i = 0;i<16;i++){
-        fprintf(ctx->FileSaveData2,"%lf    ",ctx->CalParam[i]);
+    fprintf(ctx->FileSaveData2,"%.3lf\t",ctx->SequentTime2);    
+    for(i = 0;i<NUM_PARAM_MAX;i++){
+        fprintf(ctx->FileSaveData2,"%lf\t",ctx->CalParam[i]);
     }
     fprintf(ctx->FileSaveData2,"\n");
 }
@@ -326,14 +488,14 @@ void CDigitShowBasicDoc::SaveToFile2()
     int    i,j,k;
     for(i = 0;i<ctx->sampling.CurrentSamplingTimes;i++){
         k = 0;
-        fprintf(ctx->FileSaveData0,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
-        fprintf(ctx->FileSaveData1,"%.3lf    ",ctx->sampling.SavingClock/1000000.0*i);
+        fprintf(ctx->FileSaveData0,"%.3lf\t",ctx->sampling.SavingClock/1000000.0*i);
+        fprintf(ctx->FileSaveData1,"%.3lf\t",ctx->sampling.SavingClock/1000000.0*i);
         for(j = 0;j<ModbusRTU::AI_CHANNELS;j++){
             ctx->Vtmp = ctx->ai_raw[j];
             ctx->Ptmp = ctx->cal.a[k]*ctx->Vtmp*ctx->Vtmp+ctx->cal.b[k]*ctx->Vtmp+ctx->cal.c[k];
             k = k+1;
-            fprintf(ctx->FileSaveData0,"%lf    ",ctx->Vtmp);
-            fprintf(ctx->FileSaveData1,"%lf    ",ctx->Ptmp);
+            fprintf(ctx->FileSaveData0,"%lf\t",ctx->Vtmp);
+            fprintf(ctx->FileSaveData1,"%lf\t",ctx->Ptmp);
         }
         fprintf(ctx->FileSaveData0,"\n");
         fprintf(ctx->FileSaveData1,"\n");
