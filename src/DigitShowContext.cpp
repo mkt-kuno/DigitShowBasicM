@@ -37,8 +37,8 @@ void InitContext(DigitShowContext* ctx)
     if (ctx == nullptr) return;
     
     // Initialize D/A channel assignments
-    ctx->daChannel.MotorOnOff = 0;
-    ctx->daChannel.MotorUpDown = 1;
+    ctx->daChannel.Motor = 0;
+    ctx->daChannel.MotorCruch = 1;
     ctx->daChannel.MotorSpeed = 2;
     ctx->daChannel.EP_Cell = 3;
 
@@ -187,8 +187,8 @@ void InitContext(DigitShowContext* ctx)
     ctx->errTol.StressA = 0.1;
 
     // D/A channel assignments
-    ctx->daChannel.MotorOnOff = 0;
-    ctx->daChannel.MotorUpDown = 1;
+    ctx->daChannel.Motor = 0;
+    ctx->daChannel.MotorCruch = 1;
     ctx->daChannel.MotorSpeed = 2;
     ctx->daChannel.EP_Cell = 3;
 
