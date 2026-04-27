@@ -58,6 +58,18 @@ From repository root:
 - IDs 1..7 are direct algorithms (pre-consolidation, consolidation, monotonic/cyclic/linear path variants).
 - ID 15 executes step scripts from `ctx->controlFile` (`.ctl`) using `controlFile.Num[]` to dispatch sub-modes.
 
+## ⚠️ ABSOLUTE RULE — Definition of "edit complete"
+
+**Windows CLI 動作時、編集の完全成功の判定は Release ビルドが通ることとする。**
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "DigitShowBasicM.sln" /p:Configuration=Release /p:Platform=x64 /nologo
+```
+
+エラー0・警告0 で `Build succeeded.` が出力されることを確認してからコミットすること。
+
+---
+
 ## ⚠️ ABSOLUTE RULE — Resource file character encoding
 
 **RC/RC2 ファイルを編集・新規作成する際は、以下を必ず守ること。違反はビルドエラーまたはランタイムの文字化けを引き起こす。**
