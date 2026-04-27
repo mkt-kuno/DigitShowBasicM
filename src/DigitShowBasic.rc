@@ -13,10 +13,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// English (United States) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(65001)
 
 #ifdef APSTUDIO_INVOKED
@@ -43,13 +43,13 @@ BEGIN
     "#define _AFX_NO_TRACKER_RESOURCES\r\n"
     "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
     "\r\n"
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
     "#ifdef _WIN32\r\n"
-    "LANGUAGE 17, 1\r\n"
+    "LANGUAGE 9, 1\r\n"
     "#pragma code_page(65001)\r\n"
     "#endif //_WIN32\r\n"
-    "#include ""res\\DigitShowBasic.rc2""  // Microsoft Visual C++ ?E?O?I?c?[???A?O?W?3?e?????\\?[?X\r\n"
-    "#include ""l.jpn\\afxres.rc""          // ?W???I?R??g?|?[?l??g?g\r\n"
+    "#include ""res\\DigitShowBasic.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.ENU\\afxres.rc""         // standard components\r\n"
     "#endif\r\n"
     "\0"
 END
@@ -146,8 +146,8 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "DigitShowBasicMのﾊﾞｰｼﾞｮﾝ情報"
-FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+CAPTION "About DigitShowBasicM"
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
     LTEXT           "DigitShowBasicM Version 3.0",IDC_STATIC,40,10,87,8,SS_NOPREFIX
@@ -157,7 +157,7 @@ END
 
 IDD_DIGITSHOWBASIC_FORM DIALOGEX 0, 0, 579, 455
 STYLE DS_SETFONT | WS_CHILD
-FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Voltage OutPut",IDC_STATIC,15,7,548,121
     EDITTEXT        IDC_EDIT_Vout01,93,27,56,15,ES_RIGHT | ES_AUTOHSCROLL
@@ -367,7 +367,7 @@ END
 IDD_Calibration_Factor DIALOGEX 0, 0, 362, 315
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Get Calibration Factors."
-FONT 9, "ＭＳ Ｐゴシック", 0, 0, 0x0
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,307,294,50,14
     LTEXT           "Statics",IDC_STATIC_C01,8,71,64,8
@@ -494,7 +494,7 @@ END
 IDD_CalibrationAmp DIALOG 0, 0, 179, 99
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Get Amp. Condition"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,123,78,50,14
     LTEXT           "Amp. No. :",IDC_STATIC,26,15,30,8
@@ -513,7 +513,7 @@ END
 IDD_SpecimenData DIALOG 0, 0, 331, 341
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Specimen Data"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,269,319,55,14
     LTEXT           "Diameter(mm)",IDC_STATIC,14,99,42,8
@@ -595,7 +595,7 @@ END
 IDD_DA_Vout DIALOG 0, 0, 186, 155
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Voltage Output on D/A Board"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,128,134,50,14
     LTEXT           "CH0 (Motor: On/Off)",IDC_STATIC,11,24,61,8
@@ -622,7 +622,7 @@ END
 IDD_Control_ID DIALOG 0, 0, 319, 349
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Set Up Control Parameters"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,262,302,50,14
     LTEXT           "Control ID:",IDC_STATIC,13,15,32,8
@@ -698,7 +698,7 @@ END
 IDD_DA_Pout DIALOG 0, 0, 386, 197
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Voltage Output from Physical Value"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,330,176,50,14
     LTEXT           "CH.0 (Motor)",IDC_STATIC,10,29,38,8
@@ -762,7 +762,7 @@ END
 IDD_DA_Channel DIALOG 0, 0, 255, 181
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "D/A Channel"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,145,161,50,14
     LTEXT           "CH.0 (Motor)",IDC_STATIC,12,26,38,8
@@ -814,7 +814,7 @@ END
 IDD_Control_Consolidation DIALOG 0, 0, 199, 109
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control Data in Consolidation"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,141,87,50,14
     GROUPBOX        "Motor Control",IDC_STATIC,7,2,186,83
@@ -835,7 +835,7 @@ END
 IDD_Control_MLoading DIALOG 0, 0, 235, 137
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control Data in Monotonic Loading"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,177,116,50,14
     EDITTEXT        IDC_EDIT_Motor_Cruch,59,20,40,14,ES_RIGHT | ES_AUTOHSCROLL
@@ -859,7 +859,7 @@ END
 IDD_Control_Sensitivity DIALOG 0, 0, 213, 95
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Sensitivity of Stress Control"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,7,73,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,156,73,50,14
@@ -877,7 +877,7 @@ END
 IDD_Control_Cloading DIALOG 0, 0, 263, 137
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control Parameters in Cyclic Loading"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,206,116,50,14
     LTEXT           "Flag",IDC_STATIC,15,22,14,8
@@ -906,7 +906,7 @@ END
 IDD_Control_File DIALOG 0, 0, 455, 293
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control Parameters from a file"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,378,13,50,14
     LTEXT           "Current Step No.",IDC_STATIC,13,19,50,8
@@ -961,7 +961,7 @@ END
 IDD_Control_PreConsolidation DIALOG 0, 0, 155, 71
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control in Pre-Consolidation"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,7,49,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,98,49,50,14
@@ -974,7 +974,7 @@ END
 IDD_TransAdjustment DIALOG 0, 0, 165, 167
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Adjustment of Transducers"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     PUSHBUTTON      "Close",IDCANCEL,107,146,50,14
     PUSHBUTTON      "Initial",IDC_BUTTON_InitialBullet,127,91,28,14
@@ -998,7 +998,7 @@ END
 IDD_Control_LinearStressPathLoading DIALOG 0, 0, 263, 201
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Control Parameters of Linear Effectve Stress Path Loading"
-FONT 9, "ＭＳ Ｐゴシック"
+FONT 9, "MS Shell Dlg"
 BEGIN
     PUSHBUTTON      "Close",IDCANCEL,206,180,50,14
     PUSHBUTTON      "Update",IDC_BUTTON_Update,149,180,50,14
@@ -1348,12 +1348,18 @@ END
 #define _AFX_NO_TRACKER_RESOURCES
 #define _AFX_NO_PROPERTY_RESOURCES
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
-LANGUAGE 17, 1
+LANGUAGE 9, 1
 #pragma code_page(65001)
 #endif //_WIN32
-#include "res\DigitShowBasic.rc2"  // Microsoft Visual C++ ?E?O?I?c?[???A?O?W?3?e?????\?[?X
+#include "res\DigitShowBasic.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.ENU\afxres.rc"         // standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+?E?O?I?c?[???A?O?W?3?e?????\?[?X
 #include "l.jpn\afxres.rc"          // ?W???I?R?“?|?[?l?“?g
 #endif
 
