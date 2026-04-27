@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
-                "DigitShowBasic.sln",
+                "DigitShowBasicM.sln",
                 "/p:Configuration=Debug",
                 "/p:Platform=x64",
                 "/p:WarningLevel=Level4"
@@ -19,7 +19,7 @@
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
-                "DigitShowBasic.sln",
+                "DigitShowBasicM.sln",
                 "/p:Configuration=Release",
                 "/p:Platform=x64",
                 "/p:WarningLevel=Level4"
