@@ -183,7 +183,7 @@ static CString DetectArduinoPort()
         char* comStart = strstr(friendlyName, "(COM");
         if (!comStart) continue;
         char portNumStr[16] = { 0 };
-        if (sscanf_s(comStart + 4, "%15[^)]", portNumStr, static_cast<unsigned int>(sizeof(portNumStr))) != 1)
+        if (sscanf_s(comStart + 4, "%10[^)]", portNumStr, static_cast<unsigned int>(sizeof(portNumStr))) != 1)
             continue;
         int portNum = atoi(portNumStr);
         CString portName;
@@ -195,8 +195,8 @@ static CString DetectArduinoPort()
         char* pidPtr = strstr(hwId, "PID_");
         if (!vidPtr || !pidPtr) continue;
         char vid[5] = { 0 }, pid[5] = { 0 };
-        strncpy_s(vid, vidPtr + 4, 4);
-        strncpy_s(pid, pidPtr + 4, 4);
+        strncpy_s(vid, sizeof(vid), vidPtr + 4, _TRUNCATE);
+        strncpy_s(pid, sizeof(pid), pidPtr + 4, _TRUNCATE);
         _strupr_s(vid);
         _strupr_s(pid);
 
