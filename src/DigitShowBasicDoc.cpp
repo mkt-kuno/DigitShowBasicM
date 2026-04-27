@@ -117,7 +117,7 @@ void CDigitShowBasicDoc::OpenBoard()
         // COM port is specified here - no configuration dialog needed
         ModbusRTU* modbus = GetModbusInstance();
         
-        if(!modbus->Open("COM3", 1)){
+        if(!modbus->Open("COM9", 1)){
             ctx->TextString.Format("Modbus Open failed: %s", modbus->GetLastError());
             AfxMessageBox(ctx->TextString, MB_ICONSTOP | MB_OK);
             return;
@@ -236,7 +236,7 @@ void CDigitShowBasicDoc::Cal_Param()
     //    Specimen Data in drain and undrain condition
     ctx->height = SpecimenData->Height[0]-ctx->Phyout[1];
     // Current height
-    ctx->volume = SpecimenData->Volume[0]- ctx->Phyout[4];
+    ctx->volume = SpecimenData->Volume[0]- ctx->Phyout[9];
     // Current volume in drain condition
     ctx->area = ctx->volume/ ctx->height;
     // Current area
@@ -246,15 +246,15 @@ void CDigitShowBasicDoc::Cal_Param()
     // True Volumetric Strain in drain condition (%)
     ctx->phys.er = (ctx->phys.ev- ctx->phys.ea)/2.0;
     // True Radial strain (%)
-    if(SpecimenData->VLDT1[0]>0.0 && ctx->Phyout[5]>0.0) {
-        ctx->phys.eLDT1 = -log(ctx->Phyout[5]/SpecimenData->VLDT1[0])*100.0;
+    if(SpecimenData->VLDT1[0]>0.0 && ctx->Phyout[2]>0.0) {
+        ctx->phys.eLDT1 = -log(ctx->Phyout[2]/SpecimenData->VLDT1[0])*100.0;
         // True LDT Strain (%)
     }
     else{
         ctx->phys.eLDT1 = 0.0;
     }
-    if(SpecimenData->VLDT2[0]>0.0 && ctx->Phyout[6]>0.0) {
-        ctx->phys.eLDT2 = -log(ctx->Phyout[6]/SpecimenData->VLDT2[0])*100.0;
+    if(SpecimenData->VLDT2[0]>0.0 && ctx->Phyout[3]>0.0) {
+        ctx->phys.eLDT2 = -log(ctx->Phyout[3]/SpecimenData->VLDT2[0])*100.0;
         // True LDT Strain (%)
     }
     else{
@@ -263,13 +263,13 @@ void CDigitShowBasicDoc::Cal_Param()
     ctx->phys.eLDT = (ctx->phys.eLDT1+ ctx->phys.eLDT2)/2.0;
     ctx->phys.q = ctx->Phyout[0]/ctx->area*1000.0;
     // Deviator Stress (kPa)
-    ctx->phys.sr = ctx->Phyout[2];
+    ctx->phys.sr = ctx->Phyout[4];
     // Cell(Radial) Stress (kPa)
     ctx->phys.sa = ctx->phys.q+ ctx->phys.sr;
     // Axial Stress (kPa)
     ctx->phys.p = (ctx->phys.sa+2.0* ctx->phys.sr)/3.0;
     // Mean Principal Stress (kPa)
-    ctx->phys.e_sr = ctx->Phyout[3];
+    ctx->phys.e_sr = ctx->Phyout[8];
     // Cell Effective Stress (kPa)
     ctx->phys.e_sa = ctx->phys.q+ ctx->phys.e_sr;
     // Axial Effective Stress (kPa)
