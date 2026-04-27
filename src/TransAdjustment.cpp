@@ -85,7 +85,7 @@ void CTransAdjustment::OnBUTTONUpdateDisp()
 void CTransAdjustment::OnBUTTONInitialBullet()
 {
     DigitShowContext* ctx = GetContext();
-    m_InitialBullet = ctx->Phyout[9];
+    m_InitialBullet = ctx->Phyout[4];
     UpdateData(FALSE);
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_UpdateBullet);
     myBTN1->EnableWindow(TRUE);
@@ -94,7 +94,7 @@ void CTransAdjustment::OnBUTTONInitialBullet()
 void CTransAdjustment::OnBUTTONEndBullet()
 {
     DigitShowContext* ctx = GetContext();
-    m_FinalBullet = ctx->Phyout[9];
+    m_FinalBullet = ctx->Phyout[4];
     UpdateData(FALSE);
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_UpdateBullet);
     myBTN1->EnableWindow(TRUE);
@@ -104,7 +104,7 @@ void CTransAdjustment::OnBUTTONUpdateBullet()
 {
     UpdateData(TRUE);
     DigitShowContext* ctx = GetContext();
-    ctx->cal.c[9] = ctx->cal.c[9] + (m_InitialBullet - m_FinalBullet);
+    ctx->cal.c[4] = ctx->cal.c[4] + (m_InitialBullet - m_FinalBullet);
     CButton* myBTN1 = (CButton*)GetDlgItem(IDC_BUTTON_UpdateBullet);
     myBTN1->EnableWindow(FALSE);
 }

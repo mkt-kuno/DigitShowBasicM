@@ -61,14 +61,6 @@ public:
 
 protected:
     DECLARE_MESSAGE_MAP()
-
-private:
-    void SetMotorOn(void);
-    void SetMotorOff(void);
-    void SetMotorUp(void);
-    void SetMotorDown(void);
-    void SetMotorSpeed(float voltage);
-    void SetEPCell(float voltage);
 };
 
 #endif // __DIGITSHOWBASICDOC_H_INCLUDE__
