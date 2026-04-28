@@ -109,7 +109,7 @@ void CDigitShowBasicDoc::Dump(CDumpContext& dc) const
 // USB COMポート自動検出ヘルパー
 //
 // SetupAPI でシステムに存在するシリアルポートクラスのデバイスを列挙し、
-// ハードウェアID が "USB\" で始まる USB-COMポートだけを対象に
+// ハードウェアID が "USB\" または "FTDIBUS\" で始まる USB-COMポートを対象に
 // 既知の VID/PID テーブルと照合して優先度スコアを付ける。
 // 最高スコアのポートを返す。同スコアなら番号の大きいものを優先する。
 // 既知デバイスに該当しない USB-COMポートもスコア1(最低)で候補に残る。
@@ -145,6 +145,10 @@ static CString DetectArduinoPort()
         // CP2102 / CP2104 (Silicon Labs)
         { "10C4", "EA60", 80, "CP2102/CP2104" },
         { "10C4", NULL,   78, "CP210x (any)" },
+        // FTDI FT232 / FT234X (FTDI)
+        { "0403", "6001", 80, "FTDI FT232" },
+        { "0403", "6015", 80, "FTDI FT234X" },
+        { "0403", NULL,   78, "FTDI (any)" },
     };
     const int numKnown = static_cast<int>(sizeof(knownDevices) / sizeof(knownDevices[0]));
 
@@ -171,35 +175,69 @@ static CString DetectArduinoPort()
             SPDRP_HARDWAREID, NULL, reinterpret_cast<PBYTE>(hwId), sizeof(hwId) - 1, NULL))
             continue;
 
-        // "USB\" で始まらないものはハードウェアCOMポートなのでスキップ
-        if (_strnicmp(hwId, "USB\\", 4) != 0)
+        // デバッグ: すべてのシリアルポートのハードウェアIDを出力
+        OutputDebugStringA("DetectArduinoPort: Found device - HW ID: ");
+        OutputDebugStringA(hwId);
+        OutputDebugStringA("\n");
+
+        // USB または FTDI デバイスかチェック（ハードウェアCOMポートはスキップ）
+        bool isUSB = (_strnicmp(hwId, "USB\\", 4) == 0);
+        bool isFTDI = (_strnicmp(hwId, "FTDIBUS\\", 8) == 0);
+        if (!isUSB && !isFTDI)
+        {
+            OutputDebugStringA("  -> Skipped (not USB/FTDI device)\n");
             continue;
+        }
 
         // フレンドリ名からCOMポート番号を取得 ("USB Serial Port (COM12)" → "COM12")
         char friendlyName[256] = { 0 };
         if (!SetupDiGetDeviceRegistryPropertyA(hDevInfo, &devInfoData,
             SPDRP_FRIENDLYNAME, NULL, reinterpret_cast<PBYTE>(friendlyName), sizeof(friendlyName) - 1, NULL))
+        {
+            OutputDebugStringA("  -> Skipped (no friendly name)\n");
             continue;
+        }
+
+        OutputDebugStringA("  Friendly name: ");
+        OutputDebugStringA(friendlyName);
+        OutputDebugStringA("\n");
 
         char* comStart = strstr(friendlyName, "(COM");
-        if (!comStart) continue;
+        if (!comStart) {
+            OutputDebugStringA("  -> Skipped (no COM port in friendly name)\n");
+            continue;
+        }
         char portNumStr[16] = { 0 };
         if (sscanf_s(comStart + 4, "%10[^)]", portNumStr, static_cast<unsigned int>(sizeof(portNumStr))) != 1)
+        {
+            OutputDebugStringA("  -> Skipped (failed to parse COM number)\n");
             continue;
+        }
         int portNum = atoi(portNumStr);
         CString portName;
         portName.Format("COM%s", portNumStr);
 
+        char debugMsg[128];
+        sprintf_s(debugMsg, sizeof(debugMsg), "  Port: %s\n", (LPCTSTR)portName);
+        OutputDebugStringA(debugMsg);
+
         // ハードウェアIDから VID / PID を解析
-        // 例: "USB\VID_1A86&PID_7523&REV_0264"
+        // 例: "USB\VID_1A86&PID_7523&REV_0264" または "FTDIBUS\COMPORT&VID_0403&PID_6001"
         char* vidPtr = strstr(hwId, "VID_");
         char* pidPtr = strstr(hwId, "PID_");
-        if (!vidPtr || !pidPtr) continue;
+        if (!vidPtr || !pidPtr) {
+            OutputDebugStringA("  -> Skipped (no VID/PID found)\n");
+            continue;
+        }
         char vid[5] = { 0 }, pid[5] = { 0 };
         strncpy_s(vid, sizeof(vid), vidPtr + 4, _TRUNCATE);
         strncpy_s(pid, sizeof(pid), pidPtr + 4, _TRUNCATE);
         _strupr_s(vid);
         _strupr_s(pid);
+
+        char vidPidMsg[64];
+        sprintf_s(vidPidMsg, sizeof(vidPidMsg), "  VID: %s, PID: %s\n", vid, pid);
+        OutputDebugStringA(vidPidMsg);
 
         // 既知デバイステーブルと照合して優先度を決定
         int priority = 1;   // USB-COMだがテーブル未登録の場合の最低スコア
@@ -210,9 +248,16 @@ static CString DetectArduinoPort()
                 if (knownDevices[k].pid == NULL || _stricmp(pid, knownDevices[k].pid) == 0)
                 {
                     priority = knownDevices[k].priority;
+                    char matchMsg[128];
+                    sprintf_s(matchMsg, sizeof(matchMsg), "  -> Matched: %s (priority %d)\n", knownDevices[k].desc, priority);
+                    OutputDebugStringA(matchMsg);
                     break;
                 }
             }
+        }
+
+        if (priority == 1) {
+            OutputDebugStringA("  -> Unknown device (priority 1)\n");
         }
 
         // 最高優先度を更新。同優先度ならポート番号の大きい方を採用
@@ -222,10 +267,17 @@ static CString DetectArduinoPort()
             bestPriority = priority;
             bestPortNum  = portNum;
             bestPort     = portName;
+            char bestMsg[128];
+            sprintf_s(bestMsg, sizeof(bestMsg), "  -> New best port: %s (priority %d)\n", (LPCTSTR)bestPort, bestPriority);
+            OutputDebugStringA(bestMsg);
         }
     }
 
     SetupDiDestroyDeviceInfoList(hDevInfo);
+
+    char finalMsg[128];
+    sprintf_s(finalMsg, sizeof(finalMsg), "DetectArduinoPort: Selected port: %s\n", bestPort.IsEmpty() ? "(none)" : (LPCTSTR)bestPort);
+    OutputDebugStringA(finalMsg);
 
     // Wine/Linux fallback: try ttyACM* (Arduino CDC) then ttyUSB*
     if (bestPort.IsEmpty()) {
