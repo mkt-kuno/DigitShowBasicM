@@ -263,67 +263,67 @@ void CCalibrationFactor::CF_Load()
     m_CFA00 = ctx->cal.a[0];
     m_CFB00 = ctx->cal.b[0];
     m_CFC00 = ctx->cal.c[0];
-    m_CFP00.Format("%11.5f",ctx->Phyout[0]);
+    m_CFP00.Format("%11.5f",ctx->ai_phy[0]);
     m_CFA01 = ctx->cal.a[1];
     m_CFB01 = ctx->cal.b[1];
     m_CFC01 = ctx->cal.c[1];
-    m_CFP01.Format("%11.5f",ctx->Phyout[1]);
+    m_CFP01.Format("%11.5f",ctx->ai_phy[1]);
     m_CFA02 = ctx->cal.a[2];
     m_CFB02 = ctx->cal.b[2];
     m_CFC02 = ctx->cal.c[2];
-    m_CFP02.Format("%11.5f",ctx->Phyout[2]);
+    m_CFP02.Format("%11.5f",ctx->ai_phy[2]);
     m_CFA03 = ctx->cal.a[3];
     m_CFB03 = ctx->cal.b[3];
     m_CFC03 = ctx->cal.c[3];
-    m_CFP03.Format("%11.5f",ctx->Phyout[3]);
+    m_CFP03.Format("%11.5f",ctx->ai_phy[3]);
     m_CFA04 = ctx->cal.a[4];
     m_CFB04 = ctx->cal.b[4];
     m_CFC04 = ctx->cal.c[4];
-    m_CFP04.Format("%11.5f",ctx->Phyout[4]);
+    m_CFP04.Format("%11.5f",ctx->ai_phy[4]);
     m_CFA05 = ctx->cal.a[5];
     m_CFB05 = ctx->cal.b[5];
     m_CFC05 = ctx->cal.c[5];
-    m_CFP05.Format("%11.5f",ctx->Phyout[5]);
+    m_CFP05.Format("%11.5f",ctx->ai_phy[5]);
     m_CFA06 = ctx->cal.a[6];
     m_CFB06 = ctx->cal.b[6];
     m_CFC06 = ctx->cal.c[6];
-    m_CFP06.Format("%11.5f",ctx->Phyout[6]);
+    m_CFP06.Format("%11.5f",ctx->ai_phy[6]);
     m_CFA07 = ctx->cal.a[7];
     m_CFB07 = ctx->cal.b[7];
     m_CFC07 = ctx->cal.c[7];
-    m_CFP07.Format("%11.5f",ctx->Phyout[7]);
+    m_CFP07.Format("%11.5f",ctx->ai_phy[7]);
     m_CFA08 = ctx->cal.a[8];
     m_CFB08 = ctx->cal.b[8];
     m_CFC08 = ctx->cal.c[8];
-    m_CFP08.Format("%11.5f",ctx->Phyout[8]);
+    m_CFP08.Format("%11.5f",ctx->ai_phy[8]);
     m_CFA09 = ctx->cal.a[9];
     m_CFB09 = ctx->cal.b[9];
     m_CFC09 = ctx->cal.c[9];
-    m_CFP09.Format("%11.5f",ctx->Phyout[9]);
+    m_CFP09.Format("%11.5f",ctx->ai_phy[9]);
     m_CFA10 = ctx->cal.a[10];
     m_CFB10 = ctx->cal.b[10];
     m_CFC10 = ctx->cal.c[10];
-    m_CFP10.Format("%11.5f",ctx->Phyout[10]);
+    m_CFP10.Format("%11.5f",ctx->ai_phy[10]);
     m_CFA11 = ctx->cal.a[11];
     m_CFB11 = ctx->cal.b[11];
     m_CFC11 = ctx->cal.c[11];
-    m_CFP11.Format("%11.5f",ctx->Phyout[11]);
+    m_CFP11.Format("%11.5f",ctx->ai_phy[11]);
     m_CFA12 = ctx->cal.a[12];
     m_CFB12 = ctx->cal.b[12];
     m_CFC12 = ctx->cal.c[12];
-    m_CFP12.Format("%11.5f",ctx->Phyout[12]);
+    m_CFP12.Format("%11.5f",ctx->ai_phy[12]);
     m_CFA13 = ctx->cal.a[13];
     m_CFB13 = ctx->cal.b[13];
     m_CFC13 = ctx->cal.c[13];
-    m_CFP13.Format("%11.5f",ctx->Phyout[13]);
+    m_CFP13.Format("%11.5f",ctx->ai_phy[13]);
     m_CFA14 = ctx->cal.a[14];
     m_CFB14 = ctx->cal.b[14];
     m_CFC14 = ctx->cal.c[14];
-    m_CFP14.Format("%11.5f",ctx->Phyout[14]);
+    m_CFP14.Format("%11.5f",ctx->ai_phy[14]);
     m_CFA15 = ctx->cal.a[15];
     m_CFB15 = ctx->cal.b[15];
     m_CFC15 = ctx->cal.c[15];
-    m_CFP15.Format("%11.5f",ctx->Phyout[15]);
+    m_CFP15.Format("%11.5f",ctx->ai_phy[15]);
     m_C00 = _T("CH00, Load Cell");
     m_C01 = _T("CH01, Displacement");
     m_C02 = _T("CH02, LDT-V1");
@@ -402,7 +402,7 @@ void CCalibrationFactor::OnBUTTONZero00()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[0] = ctx->cal.c[0]-ctx->Phyout[0];
+    ctx->cal.c[0] = ctx->cal.c[0]-ctx->ai_phy[0];
     CF_Load();
 }
 
@@ -410,7 +410,7 @@ void CCalibrationFactor::OnBUTTONZero01()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[1] = ctx->cal.c[1]-ctx->Phyout[1];
+    ctx->cal.c[1] = ctx->cal.c[1]-ctx->ai_phy[1];
     CF_Load();
 }
 
@@ -418,7 +418,7 @@ void CCalibrationFactor::OnBUTTONZero02()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[2] = ctx->cal.c[2]-ctx->Phyout[2];
+    ctx->cal.c[2] = ctx->cal.c[2]-ctx->ai_phy[2];
     CF_Load();
 }
 
@@ -426,7 +426,7 @@ void CCalibrationFactor::OnBUTTONZero03()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[3] = ctx->cal.c[3]-ctx->Phyout[3];
+    ctx->cal.c[3] = ctx->cal.c[3]-ctx->ai_phy[3];
     CF_Load();    
 }
 
@@ -434,7 +434,7 @@ void CCalibrationFactor::OnBUTTONZero04()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[4] = ctx->cal.c[4]-ctx->Phyout[4];
+    ctx->cal.c[4] = ctx->cal.c[4]-ctx->ai_phy[4];
     CF_Load();    
 }
 
@@ -442,7 +442,7 @@ void CCalibrationFactor::OnBUTTONZero05()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[5] = ctx->cal.c[5]-ctx->Phyout[5];
+    ctx->cal.c[5] = ctx->cal.c[5]-ctx->ai_phy[5];
     CF_Load();
 }
 
@@ -450,7 +450,7 @@ void CCalibrationFactor::OnBUTTONZero06()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[6] = ctx->cal.c[6]-ctx->Phyout[6];
+    ctx->cal.c[6] = ctx->cal.c[6]-ctx->ai_phy[6];
     CF_Load();
 }
 
@@ -458,7 +458,7 @@ void CCalibrationFactor::OnBUTTONZero07()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[7] = ctx->cal.c[7]-ctx->Phyout[7];
+    ctx->cal.c[7] = ctx->cal.c[7]-ctx->ai_phy[7];
     CF_Load();
 }
 
@@ -466,7 +466,7 @@ void CCalibrationFactor::OnBUTTONZero08()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[8] = ctx->cal.c[8]-ctx->Phyout[8];
+    ctx->cal.c[8] = ctx->cal.c[8]-ctx->ai_phy[8];
     CF_Load();
 }
 
@@ -474,7 +474,7 @@ void CCalibrationFactor::OnBUTTONZero09()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[9] = ctx->cal.c[9]-ctx->Phyout[9];
+    ctx->cal.c[9] = ctx->cal.c[9]-ctx->ai_phy[9];
     CF_Load();
 }
 
@@ -482,7 +482,7 @@ void CCalibrationFactor::OnBUTTONZero10()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[10] = ctx->cal.c[10]-ctx->Phyout[10];
+    ctx->cal.c[10] = ctx->cal.c[10]-ctx->ai_phy[10];
     CF_Load();
 }
 
@@ -490,7 +490,7 @@ void CCalibrationFactor::OnBUTTONZero11()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[11] = ctx->cal.c[11]-ctx->Phyout[11];
+    ctx->cal.c[11] = ctx->cal.c[11]-ctx->ai_phy[11];
     CF_Load();    
 }
 
@@ -498,7 +498,7 @@ void CCalibrationFactor::OnBUTTONZero12()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[12] = ctx->cal.c[12]-ctx->Phyout[12];
+    ctx->cal.c[12] = ctx->cal.c[12]-ctx->ai_phy[12];
     CF_Load();    
 }
 
@@ -506,7 +506,7 @@ void CCalibrationFactor::OnBUTTONZero13()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[13] = ctx->cal.c[13]-ctx->Phyout[13];
+    ctx->cal.c[13] = ctx->cal.c[13]-ctx->ai_phy[13];
     CF_Load();    
 }
 
@@ -514,7 +514,7 @@ void CCalibrationFactor::OnBUTTONZero14()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[14] = ctx->cal.c[14]-ctx->Phyout[14];
+    ctx->cal.c[14] = ctx->cal.c[14]-ctx->ai_phy[14];
     CF_Load();    
 }
 
@@ -522,7 +522,7 @@ void CCalibrationFactor::OnBUTTONZero15()
 {
     DigitShowContext* ctx = GetContext();
     OnBUTTONCFUpdate();
-    ctx->cal.c[15] = ctx->cal.c[15]-ctx->Phyout[15];
+    ctx->cal.c[15] = ctx->cal.c[15]-ctx->ai_phy[15];
     CF_Load();
 }
 
