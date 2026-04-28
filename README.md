@@ -2,8 +2,7 @@
 
 ![Github License](https://img.shields.io/github/license/mkt-kuno/DigitShowBasic)  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
-<img width="1019" height="739" alt="image" src="https://github.com/user-attachments/assets/c313a707-7f77-45ac-904d-c371248b2a10" />
-
+<img width="1007" height="577" alt="image" src="https://github.com/user-attachments/assets/ab155d4b-7951-4b7e-9aa6-5c637f8bbb30" />
 
 ## 簡単な説明
 東京大学の地盤研で使用されている、三軸試験機制御ソフトウェアのオープンソース版です。  
