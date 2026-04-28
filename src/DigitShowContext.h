@@ -175,8 +175,8 @@ struct ErrorTolerance {
 struct DigitShowContext {
     // Board configuration
 
-    int16_t ai_raw[ModbusRTU::AI_CHANNELS];
-    uint16_t ao_raw[ModbusRTU::AO_CHANNELS];
+    int16_t modbus_ai_raw[ModbusRTU::AI_CHANNELS];
+    uint16_t modbus_ao_raw[ModbusRTU::AO_CHANNELS];
     DaChannelAssign daChannel;
 
     // Sampling and calibration
@@ -184,12 +184,12 @@ struct DigitShowContext {
     CalibrationData cal;
 
     // Measurement data
-    float  Vout[ModbusRTU::AI_CHANNELS];
-    float  Vtmp;
-    double Phyout[ModbusRTU::AI_CHANNELS];
-    double Ptmp;
-    double CalParam[NUM_PARAM_MAX];
-    float  DAVout[ModbusRTU::AO_CHANNELS];
+    float  ai_raw[ModbusRTU::AI_CHANNELS];
+    float  ai_raw_temp;
+    double ai_phy[ModbusRTU::AI_CHANNELS];
+    double ai_phy_temp;
+    double ai_param[NUM_PARAM_MAX];
+    float  ao_raw[ModbusRTU::AO_CHANNELS];
 
     // Physical values
     PhysicalValues phys;

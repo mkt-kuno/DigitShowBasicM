@@ -399,7 +399,6 @@
 #define IDC_EDIT_SCFNum                 1773
 #define IDC_BUTTON_FIFOStart            1780
 #define IDC_BUTTON_FIFOStop             1781
-#define IDC_EDIT_Channels               1782
 #define IDC_BUTTON_WriteData            1791
 #define IDC_COMBO_Control_ID            1792
 #define IDC_COMBO_SamplingTime          1793
@@ -411,9 +410,7 @@
 #define IDC_BUTTON_EndDisp              1805
 #define IDC_EDIT_FinalDisp              1806
 #define IDC_EDIT_e_sigma1               1807
-#define IDC_EDIT_ChannelChanger         1807
 #define IDC_EDIT_e_sigma2               1808
-#define IDC_BUTTON_ChannelChange        1808
 #define IDC_STATIC_C00                  1809
 #define IDC_EDIT_sigma_rate             1810
 #define IDC_STATIC_C01                  1810

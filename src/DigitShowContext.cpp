@@ -88,8 +88,8 @@ void InitContext(DigitShowContext* ctx)
     ctx->height = 0.0;
     ctx->volume = 0.0;
     ctx->area = 0.0;
-    ctx->Vtmp = 0.0f;
-    ctx->Ptmp = 0.0;
+    ctx->ai_raw_temp = 0.0f;
+    ctx->ai_phy_temp = 0.0;
 
     // Initialize memory pointers
     ctx->pSmplData0 = nullptr;
@@ -111,9 +111,9 @@ void InitContext(DigitShowContext* ctx)
 
     // Initialize calibration factors (default: linear y = x)
     for (int i = 0; i < ModbusRTU::AI_CHANNELS; i++) {
-        ctx->Vout[i] = 0.0f;
-        ctx->Phyout[i] = 0.0;
-        ctx->CalParam[i] = 0.0;
+        ctx->ai_raw[i] = 0.0f;
+        ctx->ai_phy[i] = 0.0;
+        ctx->ai_param[i] = 0.0;
         ctx->cal.a[i] = 0.0;
         ctx->cal.b[i] = 1.0;
         ctx->cal.c[i] = 0.0;
@@ -121,7 +121,7 @@ void InitContext(DigitShowContext* ctx)
 
     // Initialize D/A output
     for (int i = 0; i < ModbusRTU::AO_CHANNELS; i++) {
-        ctx->DAVout[i] = 0.0f;
+        ctx->ao_raw[i] = 0.0f;
         ctx->cal.DA_a[i] = 0.0;
         ctx->cal.DA_b[i] = 0.0;
     }

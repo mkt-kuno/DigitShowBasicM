@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BoardSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CalibrationAmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -72,9 +69,6 @@
     <ClCompile Include="MainFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SamplingSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Specimen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,11 +78,6 @@
     <ClCompile Include="ModbusRTU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="DigitShowBasic.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DigitShowBasic.ico">
@@ -108,9 +97,6 @@
   </ItemGroup>
   <!-- Removed: caio.lib dependency (replaced with ModbusRTU) -->
   <ItemGroup>
-    <ClInclude Include="boardsettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CalibrationAmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -150,9 +136,6 @@
     <ClInclude Include="DA_Vout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataConvert.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DigitShowBasic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -174,9 +157,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="samplingsettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Specimen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -186,5 +166,10 @@
     <ClInclude Include="TransAdjustment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DigitShowBasic.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
