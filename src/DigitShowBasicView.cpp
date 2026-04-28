@@ -474,95 +474,92 @@ void CDigitShowBasicView::OnBUTTONStartSave()
     CDigitShowBasicDoc* pDoc = (CDigitShowBasicDoc *)GetDocument();
 
     CString    pFileName0, pFileName1, pFileName2;
-    CFileDialog SaveFile_dlg( FALSE, NULL, "*.dat",  OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT,
-            "Data Files(*.dat)|*.dat| All Files(*.*)|*.*| |",NULL);
+    CFileDialog SaveFile_dlg( FALSE, NULL, "*.tsv",  OFN_CREATEPROMPT | OFN_OVERWRITEPROMPT,
+            "TSV Files(*.tsv)|*.tsv| All Files(*.*)|*.*| |",NULL);
     if (SaveFile_dlg.DoModal()==IDOK){
         // File for saving the physical data 
         pFileName1 = SaveFile_dlg.GetPathName();    
         m_FileName =    SaveFile_dlg.GetFileTitle();
         TmpString = SaveFile_dlg.GetFileExt();    
         if(TmpString == "" ){
-            TmpString =".dat";
+            TmpString =".tsv";
             pFileName1 = pFileName1+TmpString;
             m_FileName = m_FileName+TmpString;
         }
-        else if(TmpString != "dat"){
+        else if(TmpString != "tsv"){
             TmpString = _T(".")+TmpString;
-            pFileName1.Replace(TmpString,".dat");
-            m_FileName = m_FileName+_T(".dat");
+            pFileName1.Replace(TmpString,".tsv");
+            m_FileName = m_FileName+_T(".tsv");
         }
         if((err = fopen_s(&ctx->FileSaveData1,(LPCSTR)pFileName1, _T("w"))) == 0)
         {
-            fprintf(ctx->FileSaveData1,"%s    ","Time(s)");
-            fprintf(ctx->FileSaveData1,"%s    ","Load_(N)");
-            fprintf(ctx->FileSaveData1,"%s    ","Disp.(mm)");
-            fprintf(ctx->FileSaveData1,"%s    ","Cell_P.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","ECellP.(kPa)");
-            fprintf(ctx->FileSaveData1,"%s    ","SP.Vol.(mm3)");
-            fprintf(ctx->FileSaveData1,"%s    ","V-LDT1_(mm)");
-            fprintf(ctx->FileSaveData1,"%s    ","V-LDT2_(mm)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH07_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH08_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH09_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH10_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH11_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH12_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH13_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH14_(V)");
-            fprintf(ctx->FileSaveData1,"%s    ","CH15_(V)");
-            fprintf(ctx->FileSaveData1,"\n");
+            fprintf(ctx->FileSaveData1,"%s\t","Time(s)");
+            fprintf(ctx->FileSaveData1,"%s\t","Load_(N)");
+            fprintf(ctx->FileSaveData1,"%s\t","Disp.(mm)");
+            fprintf(ctx->FileSaveData1,"%s\t","V-LDT1_(mm)");
+            fprintf(ctx->FileSaveData1,"%s\t","V-LDT2_(mm)");
+            fprintf(ctx->FileSaveData1,"%s\t","Cell_P.(kPa)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH05_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH06_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH07_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","ECellP.(kPa)");
+            fprintf(ctx->FileSaveData1,"%s\t","SP.Vol.(mm3)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH10_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH11_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH12_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH13_(V)");
+            fprintf(ctx->FileSaveData1,"%s\t","CH14_(V)");
+            fprintf(ctx->FileSaveData1,"%s\n","CH15_(V)");
         }
 
 
         // File for saving the voltage data
         pFileName0 = pFileName1;
-        pFileName0.Replace(".dat",".vlt");
+        pFileName0.Replace(".tsv","_v.tsv");
         if((err = fopen_s(&ctx->FileSaveData0,(LPCSTR)pFileName0, _T("w"))) == 0)
         {
-            fprintf(ctx->FileSaveData0,"%s    ","Time(s)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH00_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH01_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH02_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH03_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH04_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH05_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH06_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH07_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH08_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH09_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH10_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH11_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH12_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH13_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH14_(V)");
-            fprintf(ctx->FileSaveData0,"%s    ","CH15_(V)");
-            fprintf(ctx->FileSaveData0,"\n");
+            fprintf(ctx->FileSaveData0,"%s\t","Time(s)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH00_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH01_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH02_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH03_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH04_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH05_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH06_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH07_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH08_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH09_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH10_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH11_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH12_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH13_(V)");
+            fprintf(ctx->FileSaveData0,"%s\t","CH14_(V)");
+            fprintf(ctx->FileSaveData0,"%s\n","CH15_(V)");
         }
 
 
         // File for saving the parameter data
         pFileName2 = pFileName1;
-        pFileName2.Replace(".dat",".out");
+        pFileName2.Replace(".tsv","_p.tsv");
         if((err = fopen_s(&ctx->FileSaveData2,(LPCSTR)pFileName2, _T("w"))) == 0)
         {
-            fprintf(ctx->FileSaveData2,"%s    ","Time(s)");
-            fprintf(ctx->FileSaveData2,"%s    ","s(a)_(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","s(r)_(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","s'(a)(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","s'(r)(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","Pore_(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","p____(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","q____(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","p'___(kPa)");
-            fprintf(ctx->FileSaveData2,"%s    ","e(a)_(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","e(r)_(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","e(v)_(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","eLDT1(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","eLDT2(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","AvLDT(%)_");
-            fprintf(ctx->FileSaveData2,"%s    ","(s'a+s'r)/2");
-            fprintf(ctx->FileSaveData2,"%s    ","(s'a-s'r)/2");
-            fprintf(ctx->FileSaveData2,"\n");
+            fprintf(ctx->FileSaveData2,"%s\t","Time(s)");
+            fprintf(ctx->FileSaveData2,"%s\t","s(a)_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","s(r)_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","s'(a)(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","s'(r)(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","Pore_(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","p____(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","q____(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","p'___(kPa)");
+            fprintf(ctx->FileSaveData2,"%s\t","e(a)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","e(r)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","e(v)_(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","eLDT1(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","eLDT2(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","AvLDT(%)_");
+            fprintf(ctx->FileSaveData2,"%s\t","(s'a+s'r)/2");
+            fprintf(ctx->FileSaveData2,"%s\n","(s'a-s'r)/2");
         }
         // Timer starts
         SetTimer(3,ctx->timeSettings.Interval3,NULL);

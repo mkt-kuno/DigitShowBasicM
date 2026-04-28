@@ -21,10 +21,10 @@
 
 #pragma once
 
-// Target Windows 7 or later
+// Target Windows 10 or later for high-DPI support
 #include <SDKDDKVer.h>
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0601
+#define _WIN32_WINNT 0x0A00
 #endif
 
 #define VC_EXTRALEAN

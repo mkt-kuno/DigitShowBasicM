@@ -101,8 +101,12 @@ bool ModbusRTU::Open(const char* portName, uint8_t slaveAddress)
     // For COM ports > 9 (e.g., COM10, COM11), Windows requires "\\.\COMxx" format
     // COM1-COM9 can use either format, but we use the extended format for all ports
     // to ensure compatibility
-    char fullPortName[32];
-    sprintf_s(fullPortName, "\\\\.\\%s", portName);
+    char fullPortName[64];
+    if (portName[0] == '/') {
+        strncpy_s(fullPortName, sizeof(fullPortName), portName, _TRUNCATE);
+    } else {
+        sprintf_s(fullPortName, sizeof(fullPortName), "\\\\.\\%s", portName);
+    }
 
     m_hSerial = CreateFileA(
         fullPortName,

@@ -1,5 +1,5 @@
-//
-// DIGITSHOWBASIC.RC2 - ‚±‚ÌƒŠƒ\[ƒX‚Í Microsoft Visual C++ ‚Å’¼Ú•ÒW‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ
+ï»¿//
+// DIGITSHOWBASIC.RC2 - resources that cannot be directly edited in Microsoft Visual C++
 //
 
 #ifdef APSTUDIO_INVOKED
@@ -8,6 +8,6 @@
 
 
 /////////////////////////////////////////////////////////////////////////////
-// “Æ©‚ÉƒŠƒ\[ƒX‚ğ•ÒW‚·‚éê‡‚Í‚±‚ÌêŠ‚É’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢...
+// Add manually edited resources here...
 
 /////////////////////////////////////////////////////////////////////////////
