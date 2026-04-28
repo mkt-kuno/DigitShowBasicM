@@ -66,14 +66,6 @@ CDigitShowBasicApp theApp;
 
 BOOL CDigitShowBasicApp::InitInstance()
 {
-    // Enable per-monitor DPI awareness (Windows 10+)
-    HMODULE hUser32 = GetModuleHandleA("user32.dll");
-    if (hUser32) {
-        typedef BOOL (WINAPI* PFN_SPDAC)(DPI_AWARENESS_CONTEXT);
-        PFN_SPDAC pfn = (PFN_SPDAC)GetProcAddress(hUser32, "SetProcessDpiAwarenessContext");
-        if (pfn) pfn(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    }
-
     AfxEnableControlContainer();
 
     // 標準的な初期化処理
