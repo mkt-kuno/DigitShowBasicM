@@ -86,7 +86,6 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
-  <!-- Removed: caio.lib dependency (replaced with ModbusRTU) -->
   <ItemGroup>
     <ClInclude Include="CalibrationAmp.h" />
     <ClInclude Include="CalibrationFactor.h" />
